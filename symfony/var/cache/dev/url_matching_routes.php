@@ -8,6 +8,19 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
+        '/admin' => [[['_route' => 'admin_menu', '_controller' => 'App\\Controller\\AdminController::adminMenu'], null, null, null, false, false, null]],
+        '/admin/add-event' => [[['_route' => 'admin_add_event', '_controller' => 'App\\Controller\\AdminController::addEvent'], null, ['POST' => 0], null, false, false, null]],
+        '/admin/delete-event' => [[['_route' => 'admin_delete_event', '_controller' => 'App\\Controller\\AdminController::deleteEvent'], null, ['POST' => 0], null, false, false, null]],
+        '/admin/finish-event' => [[['_route' => 'admin_finish_event', '_controller' => 'App\\Controller\\AdminController::finishEvent'], null, ['POST' => 0], null, false, false, null]],
+        '/' => [[['_route' => 'index', '_controller' => 'App\\Controller\\HomeController::index'], null, null, null, false, false, null]],
+        '/home' => [[['_route' => 'home', '_controller' => 'App\\Controller\\HomeController::home'], null, null, null, false, false, null]],
+        '/place-bet' => [[['_route' => 'place_bet', '_controller' => 'App\\Controller\\HomeController::placeBet'], null, ['POST' => 0], null, false, false, null]],
+        '/logout' => [[['_route' => 'logout', '_controller' => 'App\\Controller\\HomeController::logout'], null, null, null, false, false, null]],
+        '/profile' => [[['_route' => 'profile', '_controller' => 'App\\Controller\\ProfileController::profile'], null, null, null, false, false, null]],
+        '/profile/change-password' => [[['_route' => 'change_password', '_controller' => 'App\\Controller\\ProfileController::changePassword'], null, ['POST' => 0], null, false, false, null]],
+        '/profile/delete' => [[['_route' => 'delete_account', '_controller' => 'App\\Controller\\ProfileController::deleteAccount'], null, ['POST' => 0], null, false, false, null]],
+        '/login' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\SecurityController::register'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'

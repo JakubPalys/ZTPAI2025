@@ -8,7 +8,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -33,65 +33,68 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/profile', name: 'profile')]
-    public function profile(Security $security): Response
+    public function profile(Security $security): JsonResponse
     {
         $user = $security->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->json(['error' => 'User not authenticated'], 401);
         }
 
         $activeBets = $this->betRepository->getSortedBetsByUser($user->getId(), 'active');
         $completedBets = $this->betRepository->getSortedBetsByUser($user->getId(), 'completed');
 
-        return $this->render('profile/profile.html.twig', [
-            'user' => $user,
+        return $this->json([
+            'user' => [
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'points' => $user->getPoints(),
+            ],
             'activeBets' => $activeBets,
             'completedBets' => $completedBets
         ]);
     }
 
     #[Route('/profile/change-password', name: 'change_password', methods: ['POST'])]
-    public function changePassword(Request $request, Security $security): Response
+    public function changePassword(Request $request): JsonResponse
     {
-        $user = $security->getUser();
+        $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->json(['error' => 'User not authenticated'], 401);
         }
-
+    
         $oldPassword = $request->request->get('old_password');
         $newPassword = $request->request->get('new_password');
         $confirmPassword = $request->request->get('confirm_password');
-
+    
         if (!$this->passwordHasher->isPasswordValid($user, $oldPassword)) {
-            $this->addFlash('error', 'Stare hasło jest niepoprawne.');
-            return $this->redirectToRoute('profile');
+            return $this->json(['error' => 'Old password is incorrect'], 400);
         }
-
+    
         if ($newPassword !== $confirmPassword) {
-            $this->addFlash('error', 'Hasła nie są takie same.');
-            return $this->redirectToRoute('profile');
+            return $this->json(['error' => 'Passwords do not match'], 400);
         }
-
+    
         $hashedPassword = $this->passwordHasher->hashPassword($user, $newPassword);
-        $user->setPasswordHash($hashedPassword);
+        $user->setPassword($hashedPassword);
         $this->entityManager->flush();
-
-        $this->addFlash('success', 'Hasło zmienione!');
-        return $this->redirectToRoute('profile');
+    
+        return $this->json(['success' => 'Password changed successfully']);
     }
+    
 
     #[Route('/profile/delete', name: 'delete_account', methods: ['POST'])]
-    public function deleteAccount(Security $security): Response
+    public function deleteAccount(Security $security): JsonResponse
     {
         $user = $security->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->json(['error' => 'User not authenticated'], 401);
         }
 
         $this->betRepository->deleteBetsByUserId($user->getId());
         $this->entityManager->remove($user);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('app_logout');
+        return $this->json(['success' => 'Account deleted successfully']);
     }
 }

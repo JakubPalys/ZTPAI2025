@@ -56,12 +56,12 @@ class User
         return $this;
     }
 
-    public function getPasswordHash(): string
+    public function getPassword(): string
     {
         return $this->password_hash;
     }
 
-    public function setPasswordHash(string $password_hash): self
+    public function setPassword(string $password_hash): self
     {
         $this->password_hash = $password_hash;
         return $this;
