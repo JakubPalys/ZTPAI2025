@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "8001:80"
+    volumes:
+      - ./symfony/:/var/www/symfony/
+    networks:
+      - symfony
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile-php
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: mysql://user:user@mysql:3306/symfonyDB?serverVersion=5.7
+    volumes:
+      - ./symfony/:/var/www/symfony/
+    networks:
+      - symfony
+  mysql:
+    image: mysql
+    command: ['--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfonyDB
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - 3306:3306
+    networks:
+      - symfony
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - symfony
+
+networks:
+  symfony:
