@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function Login({ setUser }) {
     const [username, setUsername] = useState('');
@@ -9,13 +10,21 @@ function Login({ setUser }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8001/login', { username, password });
-            if (response.data.redirect) {
+            const response = await axios.post('http://localhost:8001/login', new URLSearchParams({
+                username,
+                password
+            }), {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+
+            if (response.data.success) {
                 setUser(username);
+                localStorage.setItem('user', username);
                 window.location.href = response.data.redirect;
             }
         } catch (err) {
-            setError('Invalid credentials');
+            setError(err.response?.data?.error || 'Invalid credentials');
         }
     };
 
@@ -39,7 +48,8 @@ function Login({ setUser }) {
                 />
                 <button type="submit">Login</button>
             </form>
-            {error && <p>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <p>Don't have an account? <Link to="/register">Register here</Link></p>
         </div>
     );
 }

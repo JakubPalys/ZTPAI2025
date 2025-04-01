@@ -24,65 +24,71 @@ class SecurityController extends AbstractController
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
     }
+    #[Route('/api/users', name: 'get_users', methods: ['GET'])]
+    public function getUsers(): JsonResponse
+{
+    $users = $this->userRepository->findAll();
 
+    if (empty($users)) {
+        return $this->json(['message' => 'No users found'], 404);
+    }
+
+    $data = [];
+    foreach ($users as $user) {
+        $data[] = [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+        ];
+    }
+
+    return $this->json($data);
+}
+
+#[Route('/api/login', name: 'login', methods: ['POST'])]
+public function login(Request $request, SessionInterface $session, UserRepository $userRepository): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    if (!isset($data['email'], $data['password'])) {
+        return $this->json(['error' => 'Invalid credentials'], 400);
+    }
+
+    $user = $userRepository->findOneBy(['email' => $data['email']]);
+    if (!$user || !password_verify($data['password'], $user->getPasswordHash())) {
+        return $this->json(['error' => 'Niepoprawne dane logowania'], 401);
+    }
+
+    $session->set('user_id', $user->getId());
+
+    return $this->json(['message' => 'Logged in']);
+}
+
+   #[Route('/api/register', name: 'register', methods: ['POST'])]
+   public function register(Request $request, EntityManagerInterface $em, UserRepository $userRepository): JsonResponse
+   {
+       try {
+           $data = json_decode($request->getContent(), true);
+           if (!isset($data['name'], $data['email'], $data['password'])) {
+               return $this->json(['error' => 'Invalid data'], 400);
+           }
+   
+           if ($userRepository->findOneBy(['email' => $data['email']])) {
+               return $this->json(['error' => 'Podany email jest już zajęty'], 409);
+           }
+   
+           $user = new User();
+           $user->setName($data['name']);
+           $user->setEmail($data['email']);
+           $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
+           $user->setSessionToken(bin2hex(random_bytes(32)));
+   
+           $em->persist($user);
+           $em->flush();
+   
+           return $this->json(['message' => 'User registered'], 201);
+       } catch (\Throwable $e) {
+           return $this->json(['error' => $e->getMessage()], 500);
+       }
+    }
     
-    #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
-    public function login(Request $request, SessionInterface $session): JsonResponse
-    {
-        if ($session->get('user')) {
-            return $this->json(['redirect' => $this->generateUrl('home')]);
-        }
-
-        if ($request->isMethod('POST')) {
-            $username = $request->request->get('username');
-            $password = $request->request->get('password');
-            
-            $user = $this->userRepository->findOneBy(['username' => $username]);
-
-            if ($user && $this->passwordHasher->isPasswordValid($user, $password)) {
-                $session->set('user', $user->getUsername());
-                return $this->json(['success' => 'Login successful', 'redirect' => $this->generateUrl('home')]);
-            }
-
-            return $this->json(['error' => 'Invalid username or password'], 400);
-        }
-
-        return $this->json(['message' => 'Please provide credentials'], 400);
-    }
-
-    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
-    public function register(Request $request, SessionInterface $session): JsonResponse
-    {
-        if ($session->get('user')) {
-            return $this->json(['redirect' => $this->generateUrl('home')]);
-        }
-
-        if ($request->isMethod('POST')) {
-            $username = $request->request->get('username');
-            $email = $request->request->get('email');
-            $password = $request->request->get('password');
-            $confirmPassword = $request->request->get('confirm_password');
-
-            if ($password !== $confirmPassword) {
-                return $this->json(['error' => 'Passwords must match'], 400);
-            }
-
-            if ($this->userRepository->findOneBy(['username' => $username])) {
-                return $this->json(['error' => 'Username is already taken'], 400);
-            }
-
-            $user = new User();
-            $user->setUsername($username);
-            $user->setEmail($email);
-            $user->setPasswordHash($this->passwordHasher->hashPassword($user, $password));
-            $user->setPoints(1000);
-
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-
-            return $this->json(['success' => 'Registration successful', 'redirect' => $this->generateUrl('app_login')]);
-        }
-
-        return $this->json(['message' => 'Please provide registration details'], 400);
-    }
 }

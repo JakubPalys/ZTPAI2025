@@ -15,6 +15,7 @@ return [
     'profile' => [[], ['_controller' => 'App\\Controller\\ProfileController::profile'], [], [['text', '/profile']], [], [], []],
     'change_password' => [[], ['_controller' => 'App\\Controller\\ProfileController::changePassword'], [], [['text', '/profile/change-password']], [], [], []],
     'delete_account' => [[], ['_controller' => 'App\\Controller\\ProfileController::deleteAccount'], [], [['text', '/profile/delete']], [], [], []],
+    'get_users' => [[], ['_controller' => 'App\\Controller\\SecurityController::getUsers'], [], [['text', '/api/users']], [], [], []],
     'app_login' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'app_register' => [[], ['_controller' => 'App\\Controller\\SecurityController::register'], [], [['text', '/register']], [], [], []],
     'App\Controller\AdminController::adminMenu' => [[], ['_controller' => 'App\\Controller\\AdminController::adminMenu'], [], [['text', '/admin']], [], [], []],
@@ -28,6 +29,7 @@ return [
     'App\Controller\ProfileController::profile' => [[], ['_controller' => 'App\\Controller\\ProfileController::profile'], [], [['text', '/profile']], [], [], []],
     'App\Controller\ProfileController::changePassword' => [[], ['_controller' => 'App\\Controller\\ProfileController::changePassword'], [], [['text', '/profile/change-password']], [], [], []],
     'App\Controller\ProfileController::deleteAccount' => [[], ['_controller' => 'App\\Controller\\ProfileController::deleteAccount'], [], [['text', '/profile/delete']], [], [], []],
+    'App\Controller\SecurityController::getUsers' => [[], ['_controller' => 'App\\Controller\\SecurityController::getUsers'], [], [['text', '/api/users']], [], [], []],
     'App\Controller\SecurityController::login' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'App\Controller\SecurityController::register' => [[], ['_controller' => 'App\\Controller\\SecurityController::register'], [], [['text', '/register']], [], [], []],
 ];

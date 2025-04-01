@@ -69,6 +69,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
             'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
         ),
+        'N' => 
+        array (
+            'Nelmio\\CorsBundle\\' => 18,
+        ),
         'D' => 
         array (
             'Doctrine\\SqlFormatter\\' => 22,
@@ -269,6 +273,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'Psr\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
+        'Nelmio\\CorsBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nelmio/cors-bundle',
         ),
         'Doctrine\\SqlFormatter\\' => 
         array (
