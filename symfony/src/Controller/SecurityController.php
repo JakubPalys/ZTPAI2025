@@ -16,15 +16,16 @@ class SecurityController extends AbstractController
 {
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
-    private UserPasswordEncoderInterface $passwordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordEncoder)
+    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
+    
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(Request $request, SessionInterface $session): JsonResponse
     {
@@ -38,7 +39,7 @@ class SecurityController extends AbstractController
             
             $user = $this->userRepository->findOneBy(['username' => $username]);
 
-            if ($user && $this->passwordEncoder->isPasswordValid($user, $password)) {
+            if ($user && $this->passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getUsername());
                 return $this->json(['success' => 'Login successful', 'redirect' => $this->generateUrl('home')]);
             }
@@ -73,7 +74,7 @@ class SecurityController extends AbstractController
             $user = new User();
             $user->setUsername($username);
             $user->setEmail($email);
-            $user->setPasswordHash($this->passwordEncoder->encodePassword($user, $password));
+            $user->setPasswordHash($this->passwordHasher->hashPassword($user, $password));
             $user->setPoints(1000);
 
             $this->entityManager->persist($user);

@@ -19,6 +19,7 @@ return [
         '/profile' => [[['_route' => 'profile', '_controller' => 'App\\Controller\\ProfileController::profile'], null, null, null, false, false, null]],
         '/profile/change-password' => [[['_route' => 'change_password', '_controller' => 'App\\Controller\\ProfileController::changePassword'], null, ['POST' => 0], null, false, false, null]],
         '/profile/delete' => [[['_route' => 'delete_account', '_controller' => 'App\\Controller\\ProfileController::deleteAccount'], null, ['POST' => 0], null, false, false, null]],
+        '/api/test-db' => [[['_route' => 'test_db', '_controller' => 'App\\Controller\\SecurityController::testDatabase'], null, null, null, false, false, null]],
         '/login' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\SecurityController::register'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
     ],
