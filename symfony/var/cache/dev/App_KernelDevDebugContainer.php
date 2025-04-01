@@ -16,7 +16,7 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerQtelxpe\App_KernelDevDebugContainer([
     'container.build_hash' => 'Qtelxpe',
-    'container.build_id' => '6bbf7ea3',
-    'container.build_time' => 1743506319,
+    'container.build_id' => 'f97f0832',
+    'container.build_time' => 1743513681,
     'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerQtelxpe');

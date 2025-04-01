@@ -1,5 +1,3 @@
-// src/pages/Register.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -16,7 +14,7 @@ function Register() {
         e.preventDefault();
     
         const userData = {
-            username,
+            name: username,
             email,
             password
         };
@@ -25,7 +23,7 @@ function Register() {
             const response = await axios.post('http://localhost:8001/api/register', userData);
             setSuccessMessage(response.data.message);
             setError('');
-            setTimeout(() => navigate('/login'), 2000);
+
         } catch (err) {
             setError('Błąd rejestracji: ' + (err.response?.data.message || 'Spróbuj ponownie.'));
             setSuccessMessage('');

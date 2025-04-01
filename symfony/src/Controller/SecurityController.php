@@ -45,6 +45,23 @@ class SecurityController extends AbstractController
     return $this->json($data);
 }
 
+#[Route('/api/users/{id}', name: 'get_user', methods: ['GET'])]
+public function getUserById(int $id): JsonResponse
+{
+    $user = $this->userRepository->findUserById($id);
+
+    if (!$user) {
+        return $this->json(['error' => 'Użytkownik nie znaleziony'], 404);
+    }
+
+    return $this->json([
+        'id' => $user->getId(),
+        'username' => $user->getUsername(),
+        'email' => $user->getEmail(),
+        'points' => $user->getPoints(),
+    ]);
+}
+
 #[Route('/api/login', name: 'login', methods: ['POST'])]
 public function login(Request $request, SessionInterface $session, UserRepository $userRepository): JsonResponse
 {
@@ -77,10 +94,9 @@ public function login(Request $request, SessionInterface $session, UserRepositor
            }
    
            $user = new User();
-           $user->setName($data['name']);
+           $user->setUsername($data['name']);
            $user->setEmail($data['email']);
            $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
-           $user->setSessionToken(bin2hex(random_bytes(32)));
    
            $em->persist($user);
            $em->flush();

@@ -1,55 +1,54 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
-function Login({ setUser }) {
-    const [username, setUsername] = useState('');
+function Login() {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:8001/login', new URLSearchParams({
-                username,
-                password
-            }), {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
 
-            if (response.data.success) {
-                setUser(username);
-                localStorage.setItem('user', username);
-                window.location.href = response.data.redirect;
-            }
+        try {
+            const response = await axios.post('http://localhost:8001/api/login', { email, password });
+            alert(response.data.message);
+            setError('');
+            navigate('/');
         } catch (err) {
-            setError(err.response?.data?.error || 'Invalid credentials');
+            setError('Błąd logowania: ' + (err.response?.data.error || 'Spróbuj ponownie.'));
         }
     };
 
     return (
         <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Login</button>
-            </form>
+            <h2>Logowanie</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <p>Don't have an account? <Link to="/register">Register here</Link></p>
+            <form onSubmit={handleLogin}>
+                <div>
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="password">Hasło</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Zaloguj się</button>
+            </form>
+            <p>Nie masz konta? <a href="/register">Zarejestruj się</a></p>
         </div>
     );
 }
