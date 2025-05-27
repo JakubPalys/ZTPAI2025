@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-function Home({ user }) {
+function Home() {
     const [events, setEvents] = useState([]);
     const [betAmount, setBetAmount] = useState(0);
     const [betChoice, setBetChoice] = useState('home');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const [user, setUser] = useState('');
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await axios.get('http://localhost:8001/home', { withCredentials: true });
-                if (response.data.events) {
-                    setEvents(response.data.events);
-                }
-            } catch (err) {
-                setError('Failed to fetch events');
+    const fetchUserAndEvents = async () => {
+        try {
+            const userRes = await axios.get('http://localhost:8001/api/me', { withCredentials: true });
+            setUser(userRes.data.username);
+
+            const eventsRes = await axios.get('http://localhost:8001/home', { withCredentials: true });
+            if (eventsRes.data.events) {
+                setEvents(eventsRes.data.events);
             }
-        };
-        fetchEvents();
-    }, []);
+        } catch (err) {
+            setError('Nie udało się załadować danych');
+        }
+    };
+
+    fetchUserAndEvents();
+}, []);
 
     const handleBet = async (eventId) => {
         try {
@@ -39,8 +46,17 @@ function Home({ user }) {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await axios.post('http://localhost:8001/logout', {}, { withCredentials: true });
+            navigate('/login');
+        } catch (err) {
+            setError('Error logging out');
+        }
+    };
+
     return (
-        <div>
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '50px' }}>
             <h2>Welcome, {user}</h2>
             <h3>Events</h3>
             <div>
@@ -67,7 +83,25 @@ function Home({ user }) {
                     <p>Loading events...</p>
                 )}
             </div>
-            {error && <p>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+
+            {/* Logout button in bottom-left corner */}
+            <button
+                onClick={handleLogout}
+                style={{
+                    position: 'fixed',
+                    bottom: '10px',
+                    left: '10px',
+                    padding: '10px 20px',
+                    backgroundColor: '#d9534f',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                }}
+            >
+                Logout
+            </button>
         </div>
     );
 }

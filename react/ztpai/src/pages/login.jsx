@@ -12,10 +12,10 @@ function Login() {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:8001/api/login', { email, password });
+            const response = await axios.post('http://localhost:8001/api/login', { email, password },{ withCredentials: true });
             alert(response.data.message);
             setError('');
-            navigate('/');
+            navigate('/home');
         } catch (err) {
             setError('Błąd logowania: ' + (err.response?.data.error || 'Spróbuj ponownie.'));
         }

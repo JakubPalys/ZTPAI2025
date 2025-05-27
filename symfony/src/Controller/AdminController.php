@@ -124,12 +124,12 @@ class AdminController extends AbstractController
         $event = $this->eventRepository->find($request->request->get('event_id'));
 
         if ($event) {
-            $event->setStatus(2); // Mark event as finished (status 2 assumed)
+            $event->setStatus(2); 
             $this->entityManager->flush();
 
             $bets = $this->betRepository->findBy(['event' => $event]);
             foreach ($bets as $bet) {
-                // Settle bet logic
+                //TODO Settle bet logic 
             }
 
             return $this->json(['success' => 'Event finished and bets settled']);

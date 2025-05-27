@@ -20,6 +20,7 @@ return [
         '/profile/change-password' => [[['_route' => 'change_password', '_controller' => 'App\\Controller\\ProfileController::changePassword'], null, ['POST' => 0], null, false, false, null]],
         '/profile/delete' => [[['_route' => 'delete_account', '_controller' => 'App\\Controller\\ProfileController::deleteAccount'], null, ['POST' => 0], null, false, false, null]],
         '/api/users' => [[['_route' => 'get_users', '_controller' => 'App\\Controller\\SecurityController::getUsers'], null, ['GET' => 0], null, false, false, null]],
+        '/api/me' => [[['_route' => 'me', '_controller' => 'App\\Controller\\SecurityController::me'], null, ['GET' => 0], null, false, false, null]],
         '/api/login' => [[['_route' => 'login', '_controller' => 'App\\Controller\\SecurityController::login'], null, ['POST' => 0], null, false, false, null]],
         '/api/register' => [[['_route' => 'register', '_controller' => 'App\\Controller\\SecurityController::register'], null, ['POST' => 0], null, false, false, null]],
     ],
