@@ -310,7 +310,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.2pHg8z8"/>
+      <argument type="service" id=".service_locator.DLY_u9K"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1495,7 +1495,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.2pHg8z8"/>
+      <argument type="service" id=".service_locator.DLY_u9K"/>
     </service>
     <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver">
       <call method="addLoader">
@@ -3333,20 +3333,21 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.OzEre6h" method="withContext"/>
     </service>
-    <service id=".service_locator..6tMTfS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.prnl249" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="userRoleRepository" type="service_closure" id="App\Repository\UserRoleRepository"/>
       </argument>
     </service>
-    <service id=".service_locator..6tMTfS.App\Controller\SecurityController::register()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.prnl249.App\Controller\SecurityController::register()" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\SecurityController::register()"/>
       <argument>App\Controller\SecurityController::register()</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator..6tMTfS" method="withContext"/>
+      <factory service=".service_locator.prnl249" method="withContext"/>
     </service>
-    <service id=".service_locator.2pHg8z8" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.DLY_u9K" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.zHyJIs5.kernel::registerContainerConfiguration()"/>
@@ -3357,14 +3358,14 @@
         <argument key="App\Controller\ProfileController::profile" type="service_closure" id=".service_locator.JzmZXyf"/>
         <argument key="App\Controller\ProfileController::deleteAccount" type="service_closure" id=".service_locator.UNAQMaP"/>
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.OzEre6h.App\Controller\SecurityController::login()"/>
-        <argument key="App\Controller\SecurityController::register" type="service_closure" id=".service_locator..6tMTfS.App\Controller\SecurityController::register()"/>
+        <argument key="App\Controller\SecurityController::register" type="service_closure" id=".service_locator.prnl249.App\Controller\SecurityController::register()"/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.zHyJIs5.kernel::registerContainerConfiguration()"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.zHyJIs5.kernel::loadRoutes()"/>
         <argument key="App\Controller\HomeController:home" type="service_closure" id=".service_locator.OzEre6h.App\Controller\HomeController::home()"/>
         <argument key="App\Controller\ProfileController:profile" type="service_closure" id=".service_locator.JzmZXyf"/>
         <argument key="App\Controller\ProfileController:deleteAccount" type="service_closure" id=".service_locator.UNAQMaP"/>
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.OzEre6h.App\Controller\SecurityController::login()"/>
-        <argument key="App\Controller\SecurityController:register" type="service_closure" id=".service_locator..6tMTfS.App\Controller\SecurityController::register()"/>
+        <argument key="App\Controller\SecurityController:register" type="service_closure" id=".service_locator.prnl249.App\Controller\SecurityController::register()"/>
       </argument>
     </service>
     <service id=".service_locator.va_rxC4" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -4223,7 +4224,7 @@
     <service id="security.firewall.context_locator" alias=".service_locator.bsoXAxw"/>
     <service id="Symfony\Component\Security\Core\User\UserCheckerInterface" alias="security.user_checker"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.pRu6x_4" public="true"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.2pHg8z8"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.DLY_u9K"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.BxSdgVt"/>
     <service id="Psr\Log\LoggerInterface" alias="logger"/>
     <service id="event_dispatcher" alias="debug.event_dispatcher" public="true"/>
@@ -4235,7 +4236,7 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id=".service_locator.n_ENPtW" alias=".service_locator.zHyJIs5"/>
     <service id=".service_locator.hNMhKaf" alias=".service_locator.OzEre6h"/>
-    <service id=".service_locator.bNKSdLn" alias=".service_locator..6tMTfS"/>
+    <service id=".service_locator.y6ddfay" alias=".service_locator.prnl249"/>
     <service id=".service_locator.dUVgAip" alias=".service_locator.ZyP9f7K"/>
   </services>
 </container>
