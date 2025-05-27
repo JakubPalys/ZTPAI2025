@@ -45,23 +45,6 @@ class SecurityController extends AbstractController
     return $this->json($data);
 }
 
-#[Route('/api/me', name: 'me', methods: ['GET'])]
-public function me(SessionInterface $session, UserRepository $userRepository): JsonResponse
-{
-    $userId = $session->get('user_id');
-    if (!$userId) {
-        return $this->json(['error' => 'Not authenticated'], 401);
-    }
-
-    $user = $userRepository->find($userId);
-    if (!$user) {
-        return $this->json(['error' => 'User not found'], 404);
-    }
-
-    return $this->json(['username' => $user->getUsername(), 'id' => $user->getId()]);
-}
-
-
 #[Route('/api/users/{id}', name: 'get_user', methods: ['GET'])]
 public function getUserById(int $id): JsonResponse
 {
