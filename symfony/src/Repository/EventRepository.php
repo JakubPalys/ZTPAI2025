@@ -12,4 +12,17 @@ class EventRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Event::class);
     }
+
+    public function getEventsInDateRange(\DateTime $from, \DateTime $to): array
+    {
+    return $this->createQueryBuilder('e')
+        ->where('e.eventDate BETWEEN :from AND :to')
+        ->andWhere('e.statusId = :status')
+        ->setParameter('from', $from)
+        ->setParameter('to', $to)
+        ->setParameter('status', 1)
+        ->orderBy('e.eventDate', 'ASC')
+        ->getQuery()
+        ->getResult();
+    }
 }

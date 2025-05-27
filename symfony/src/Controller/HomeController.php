@@ -32,34 +32,40 @@ class HomeController extends AbstractController
     }
 
     #[Route('/', name: 'index')]
-    public function index(SessionInterface $session): Response
+    public function index(SessionInterface $session): JsonResponse
     {
         if (!$session->get('user')) {
-            return $this->json(['error' => 'User not logged in'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'User not logged in'], 401);
         }
         return $this->json(['redirect' => $this->generateUrl('home')]);
     }
 
     #[Route('/home', name: 'home')]
-    public function home(SessionInterface $session): Response
+    public function home(SessionInterface $session, UserRepository $userRepository): JsonResponse
     {
-        if (!$session->get('user')) {
-            return $this->json(['error' => 'User not logged in'], Response::HTTP_UNAUTHORIZED);
+        $userId = $session->get('user_id');
+        if (!$userId) {
+            return $this->json(['error' => 'Not authenticated'], 401);
         }
 
-        $user = $this->userRepository->findOneBy(['username' => $session->get('user')]);
+        $user = $userRepository->find($userId);
         if (!$user) {
-            return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'User not found'], 404);
         }
 
-        $events = $this->eventRepository->findBy(['event_date' => new \DateTime()], ['event_date' => 'ASC']);
-        
+
+        $now = new \DateTime();
+        $weekAgo = (clone $now)->modify('-7 days');
+        $weekAhead = (clone $now)->modify('+7 days');
+
+        $events = $this->eventRepository->getEventsInDateRange($weekAgo, $weekAhead);
+
         $eventsData = [];
         foreach ($events as $event) {
             $eventsData[] = [
                 'id' => $event->getId(),
-                'home_team' => $event->getHomeTeam(),
-                'away_team' => $event->getAwayTeam(),
+                'event_date' => $event->getEventDate(),
+                'status_id' => $event->getStatusId(),
                 'event_date' => $event->getEventDate()->format('Y-m-d H:i:s'),
                 'home_odds' => $event->getHomeOdds(),
                 'away_odds' => $event->getAwayOdds(),
@@ -78,10 +84,10 @@ class HomeController extends AbstractController
     }
 
     #[Route('/place-bet', name: 'place_bet', methods: ['POST'])]
-    public function placeBet(Request $request, SessionInterface $session): Response
+    public function placeBet(Request $request, SessionInterface $session): JsonResponse
     {
         if (!$session->get('user')) {
-            return $this->json(['error' => 'User not logged in'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'User not logged in'], 401);
         }
 
         $eventId = $request->request->get('event_id');
@@ -92,11 +98,11 @@ class HomeController extends AbstractController
         $event = $this->eventRepository->find($eventId);
 
         if (!$event || !$user) {
-            return $this->json(['error' => 'Event or User not found'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Event or User not found'], 404);
         }
 
         if ($user->getPoints() < $betAmount) {
-            return $this->json(['error' => 'Insufficient points for this bet'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Insufficient points for this bet'], 400);
         }
 
         $odds = match ($betChoice) {
@@ -123,7 +129,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/logout', name: 'logout')]
-    public function logout(SessionInterface $session): Response
+    public function logout(SessionInterface $session): JsonResponse
     {
         $session->clear();
         return $this->json(['success' => 'User logged out successfully']);

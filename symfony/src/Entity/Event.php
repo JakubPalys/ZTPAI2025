@@ -10,12 +10,95 @@ class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private int $event_id;
+    #[ORM\Column(name: 'event_id', type: 'integer')]
+    private int $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $event_name;
+    #[ORM\Column(name: 'event_name', type: 'string', length: 255)]
+    private string $eventName;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTime $event_date;
+    #[ORM\Column(name: 'event_date', type: 'datetime')]
+    private \DateTime $eventDate;
+
+    #[ORM\Column(name: 'status_id', type: 'integer')]
+    private int $statusId;
+
+    #[ORM\Column(name: 'home_odds', type: 'float')]
+    private float $homeOdds;
+
+    #[ORM\Column(name: 'away_odds', type: 'float')]
+    private float $awayOdds;
+
+    #[ORM\Column(name: 'draw_odds', type: 'float')]
+    private float $drawOdds;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getEventName(): string
+    {
+        return $this->eventName;
+    }
+
+    public function setEventName(string $eventName): self
+    {
+        $this->eventName = $eventName;
+        return $this;
+    }
+
+    public function getEventDate(): \DateTime
+    {
+        return $this->eventDate;
+    }
+
+    public function setEventDate(\DateTime $eventDate): self
+    {
+        $this->eventDate = $eventDate;
+        return $this;
+    }
+
+    public function getStatusId(): int
+    {
+        return $this->statusId;
+    }
+
+    public function setStatusId(int $statusId): self
+    {
+        $this->statusId = $statusId;
+        return $this;
+    }
+
+    public function getHomeOdds(): float
+    {
+        return $this->homeOdds;
+    }
+
+    public function setHomeOdds(float $homeOdds): self
+    {
+        $this->homeOdds = $homeOdds;
+        return $this;
+    }
+
+    public function getAwayOdds(): float
+    {
+        return $this->awayOdds;
+    }
+
+    public function setAwayOdds(float $awayOdds): self
+    {
+        $this->awayOdds = $awayOdds;
+        return $this;
+    }
+
+    public function getDrawOdds(): float
+    {
+        return $this->drawOdds;
+    }
+
+    public function setDrawOdds(float $drawOdds): self
+    {
+        $this->drawOdds = $drawOdds;
+        return $this;
+    }
 }

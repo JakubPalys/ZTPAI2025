@@ -4,32 +4,36 @@ import { useNavigate } from 'react-router-dom';
 
 function Home() {
     const [events, setEvents] = useState([]);
-    const [betAmount, setBetAmount] = useState(0);
-    const [betChoice, setBetChoice] = useState('home');
+    const [betAmounts, setBetAmounts] = useState({});
+    const [betChoices, setBetChoices] = useState({});
     const [error, setError] = useState('');
-    const navigate = useNavigate();
     const [user, setUser] = useState('');
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
-    const fetchUserAndEvents = async () => {
-        try {
-            const userRes = await axios.get('http://localhost:8001/api/me', { withCredentials: true });
-            setUser(userRes.data.username);
-
-            const eventsRes = await axios.get('http://localhost:8001/home', { withCredentials: true });
-            if (eventsRes.data.events) {
-                setEvents(eventsRes.data.events);
+        const fetchUserAndEvents = async () => {
+            try {
+                const eventsRes = await axios.get('http://localhost:8001/home', { withCredentials: true });
+                setUser(eventsRes.data.user.username);
+                if (eventsRes.data.events) {
+                    setEvents(eventsRes.data.events);
+                }
+            } catch (err) {
+                setError('Nie udało się załadować danych');
+            } finally {
+                setLoading(false);
             }
-        } catch (err) {
-            setError('Nie udało się załadować danych');
-        }
-    };
+        };
 
-    fetchUserAndEvents();
-}, []);
+        fetchUserAndEvents();
+    }, []);
 
     const handleBet = async (eventId) => {
         try {
+            const betAmount = parseFloat(betAmounts[eventId]) || 0;
+            const betChoice = betChoices[eventId] || 'home';
+
             const response = await axios.post('http://localhost:8001/place-bet', {
                 event_id: eventId,
                 bet_amount: betAmount,
@@ -55,37 +59,59 @@ function Home() {
         }
     };
 
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleString('pl-PL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     return (
         <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '50px' }}>
-            <h2>Welcome, {user}</h2>
-            <h3>Events</h3>
-            <div>
-                {events.length > 0 ? (
-                    events.map((event) => (
-                        <div key={event.id}>
-                            <p>{event.home_team} vs {event.away_team}</p>
-                            <p>{event.event_date}</p>
-                            <p>Home Odds: {event.home_odds} | Away Odds: {event.away_odds} | Draw Odds: {event.draw_odds}</p>
-                            <input
-                                type="number"
-                                placeholder="Bet Amount"
-                                onChange={(e) => setBetAmount(e.target.value)}
-                            />
-                            <select onChange={(e) => setBetChoice(e.target.value)}>
-                                <option value="home">Home</option>
-                                <option value="away">Away</option>
-                                <option value="draw">Draw</option>
-                            </select>
-                            <button onClick={() => handleBet(event.id)}>Place Bet</button>
-                        </div>
-                    ))
-                ) : (
-                    <p>Loading events...</p>
-                )}
-            </div>
+            <h2>Witaj, {user}</h2>
+            <h3>Wydarzenia</h3>
+
+            {loading ? (
+                <p>Ładowanie danych...</p>
+            ) : (
+                <div>
+                    {events.length > 0 ? (
+                        events.map((event) => (
+                            <div key={event.id} style={{ borderBottom: '1px solid #ccc', marginBottom: '15px', paddingBottom: '10px' }}>
+                                <p><strong>{event.home_team}</strong> vs <strong>{event.away_team}</strong></p>
+                                <p>Data: {formatDate(event.event_date)}</p>
+                                <p>Kursy: Dom {event.home_odds.toFixed(2)} | Goście {event.away_odds.toFixed(2)} | Remis {event.draw_odds.toFixed(2)}</p>
+
+                                <input
+                                    type="number"
+                                    placeholder="Kwota zakładu"
+                                    value={betAmounts[event.id] || ''}
+                                    onChange={(e) => setBetAmounts({ ...betAmounts, [event.id]: e.target.value })}
+                                    min="1"
+                                />
+                                <select
+                                    value={betChoices[event.id] || 'home'}
+                                    onChange={(e) => setBetChoices({ ...betChoices, [event.id]: e.target.value })}
+                                >
+                                    <option value="home">Dom</option>
+                                    <option value="away">Goście</option>
+                                    <option value="draw">Remis</option>
+                                </select>
+                                <button onClick={() => handleBet(event.id)}>Postaw zakład</button>
+                            </div>
+                        ))
+                    ) : (
+                        <p>Brak wydarzeń w tym okresie.</p>
+                    )}
+                </div>
+            )}
+
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
-            {/* Logout button in bottom-left corner */}
             <button
                 onClick={handleLogout}
                 style={{
@@ -100,7 +126,7 @@ function Home() {
                     cursor: 'pointer'
                 }}
             >
-                Logout
+                Wyloguj
             </button>
         </div>
     );
