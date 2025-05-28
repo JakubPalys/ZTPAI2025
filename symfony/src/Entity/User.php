@@ -33,7 +33,7 @@ class User
     {
         return $this->user_id;
     }
-
+    
     public function getUsername(): string
     {
         return $this->username;

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UsersList from "./pages/UsersList"; 
+import Profile from "./pages/Profile";
 import UserDetails from "./pages/UserDetails";
 import Home from "./pages/Home";
 
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/login" element={<Login setUser={setUser} />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/users" element={<UsersList />} /> 
+                <Route path="/profile" element={<Profile />} /> 
                 <Route path="/home" element={<Home />} />
                 <Route path="/users/:id" element={<UserDetails />} />
             </Routes>

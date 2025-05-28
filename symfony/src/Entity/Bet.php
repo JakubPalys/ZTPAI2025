@@ -34,7 +34,6 @@ class Bet
     #[ORM\Column(type: "float")]
     private float $potential_win;
 
-    // Getters and Setters
 
     public function getBetId(): ?int
     {
