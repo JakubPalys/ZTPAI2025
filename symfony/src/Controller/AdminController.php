@@ -5,18 +5,23 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Repository\UserRoleRepository;
 use App\Repository\BetRepository;
+use App\Repository\ResultRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AdminController extends AbstractController
 {
     private EventRepository $eventRepository;
     private UserRepository $userRepository;
+    private UserRoleRepository $userRoleRepository;
+    private ResultRepository $resultRepository;
     private BetRepository $betRepository;
     private EntityManagerInterface $entityManager;
 
@@ -28,21 +33,26 @@ class AdminController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    private function checkAdmin(): ?JsonResponse
-    {
-        $user = $this->getUser();
-
-        if (!$user || $user->getRole()->getRoleName() !== 'admin') {
-            return $this->json(['error' => 'Access denied. Admin privileges required.'], Response::HTTP_FORBIDDEN);
-        }
-
-        return null;
+    private function checkAdmin(SessionInterface $session, UserRepository $userRepository): ?JsonResponse
+{
+    $userId = $session->get('user_id');
+    if (!$userId) {
+        return $this->json(['error' => 'User not authenticated'], 401);
     }
 
+    $user = $userRepository->find($userId);
+    if (!$user || $user->getRole()->getRoleName() !== 'admin') {
+        return $this->json(['error' => 'Access denied. Admin privileges required.'], 403);
+    }
+
+
+    return null;
+}
+
     #[Route('/api/admin', name: 'admin_menu')]
-    public function adminMenu(): JsonResponse
+    public function adminMenu(SessionInterface $session): JsonResponse
     {
-        $checkAdminResponse = $this->checkAdmin();
+        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
         if ($checkAdminResponse) {
             return $checkAdminResponse;
         }
@@ -56,7 +66,7 @@ class AdminController extends AbstractController
                 'id' => $event->getId(),
                 'event_name' => $event->getEventName(),
                 'event_date' => $event->getEventDate()->format('Y-m-d H:i:s'),
-                'status' => $event->getStatus(),
+                'status' => $event->getStatusId(),
             ];
         }
 
@@ -74,12 +84,12 @@ class AdminController extends AbstractController
             'events' => $eventsData,
             'users' => $usersData,
         ]);
-    }
+}
 
     #[Route('/api/admin/add-event', name: 'admin_add_event', methods: ['POST'])]
     public function addEvent(Request $request): JsonResponse
     {
-        $checkAdminResponse = $this->checkAdmin();
+        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
         if ($checkAdminResponse) {
             return $checkAdminResponse;
         }
@@ -97,7 +107,7 @@ class AdminController extends AbstractController
     #[Route('/api/admin/delete-event', name: 'admin_delete_event', methods: ['POST'])]
     public function deleteEvent(Request $request): JsonResponse
     {
-        $checkAdminResponse = $this->checkAdmin();
+        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
         if ($checkAdminResponse) {
             return $checkAdminResponse;
         }
@@ -110,31 +120,58 @@ class AdminController extends AbstractController
             return $this->json(['success' => 'Event deleted successfully']);
         }
 
-        return $this->json(['error' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return $this->json(['error' => 'Event not found'], 404);
     }
 
     #[Route('/api/admin/finish-event', name: 'admin_finish_event', methods: ['POST'])]
-    public function finishEvent(Request $request): JsonResponse
-    {
-        $checkAdminResponse = $this->checkAdmin();
-        if ($checkAdminResponse) {
-            return $checkAdminResponse;
-        }
-
-        $event = $this->eventRepository->find($request->request->get('event_id'));
-
-        if ($event) {
-            $event->setStatus(2); 
-            $this->entityManager->flush();
-
-            $bets = $this->betRepository->findBy(['event' => $event]);
-            foreach ($bets as $bet) {
-                //TODO Settle bet logic 
-            }
-
-            return $this->json(['success' => 'Event finished and bets settled']);
-        }
-
-        return $this->json(['error' => 'Event not found'], Response::HTTP_NOT_FOUND);
+public function finishEvent(Request $request, ResultRepository $resultRepository,SessionInterface $session): JsonResponse
+{
+    $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
+    if ($checkAdminResponse) {
+        return $checkAdminResponse;
     }
+
+    $eventId = $request->request->get('event_id');
+    $betResultId = $request->request->get('bet_result_id');
+    if (!$eventId || !$betResultId) {
+        return $this->json(['error' => 'Brak event_id lub bet_result_id'], 400);
+    }
+
+    $event = $this->eventRepository->find($eventId);
+
+    if (!$event) {
+        return $this->json(['error' => 'Event not found'], 404);
+    }
+
+    $result = $resultRepository->find($betResultId);
+    if (!$result) {
+        return $this->json(['error' => 'Invalid bet_result_id'], 400);
+    }
+
+    $event->setStatusId(2);
+    $event->setResult($result);
+
+    $bets = $this->betRepository->findBy(['event' => $event]);
+    $winners = 0;
+    $losers = 0;
+    foreach ($bets as $bet) {
+        if ($bet->getBetChoice() === $result->getResultName()) {
+            $bet->setOutcome(1); 
+            $user = $bet->getUser();
+            $user->setPoints($user->getPoints() + $bet->getPotentialWin());
+            $winners++;
+        } else {
+            $bet->setOutcome(2);
+            $losers++;
+        }
+    }
+
+    $this->entityManager->flush();
+
+    return $this->json([
+        'success' => "Event finished and bets settled",
+        'winners' => $winners,
+        'losers' => $losers,
+    ]);
+}
 }

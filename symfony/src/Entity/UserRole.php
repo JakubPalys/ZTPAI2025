@@ -15,4 +15,20 @@ class UserRole
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $role_name;
+    
+    public function getId(): int
+    {
+        return $this->role_id;
+    }
+
+    public function getRoleName(): string
+    {
+        return $this->role_name;
+    }
+
+    public function setRoleName(string $role_name): self
+    {
+        $this->role_name = $role_name;
+        return $this;
+    }
 }

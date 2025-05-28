@@ -122,7 +122,7 @@ class Bet
 
     public function setOutcome(int $outcome): self
     {
-        $this->outcome = $$outcome;
+        $this->outcome = $outcome;
         return $this;
     }
 }

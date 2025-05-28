@@ -105,4 +105,16 @@ class Event
         $this->drawOdds = $drawOdds;
         return $this;
     }
+
+    public function getResult(): ?Result
+    {
+        return $this->result;
+    }
+
+    public function setResult(?Result $result): self
+    {
+        $this->result = $result;
+        return $this;
+    }
+
 }
