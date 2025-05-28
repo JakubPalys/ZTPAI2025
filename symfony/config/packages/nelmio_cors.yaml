@@ -3,10 +3,10 @@ nelmio_cors:
         allow_credentials: true
         allow_origin: ['http://localhost:5173']  # Dopuszczone źródło (frontend)
         allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With']
-        allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+        allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     paths:
         '^/api/':  # Dostosuj do ścieżki, której używasz w API
             allow_credentials: true
             allow_origin: ['http://localhost:5173']  # Dopuszczone źródło
             allow_headers: ['Content-Type', 'Authorization']
-            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']

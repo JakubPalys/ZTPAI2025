@@ -32,7 +32,7 @@ class ProfileController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-    #[Route('/profile', name: 'profile')]
+    #[Route('/api/profile', name: 'profile')]
     public function profile(Security $security): JsonResponse
     {
         $user = $security->getUser();
@@ -55,7 +55,7 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/change-password', name: 'change_password', methods: ['POST'])]
+    #[Route('/api/profile/change-password', name: 'change_password', methods: ['POST'])]
     public function changePassword(Request $request): JsonResponse
     {
         $user = $this->getUser();
@@ -83,7 +83,7 @@ class ProfileController extends AbstractController
     }
     
 
-    #[Route('/profile/delete', name: 'delete_account', methods: ['POST'])]
+    #[Route('/api/profile/delete', name: 'delete_account', methods: ['POST'])]
     public function deleteAccount(Security $security): JsonResponse
     {
         $user = $security->getUser();

@@ -8,24 +8,26 @@ function Home() {
     const [betChoices, setBetChoices] = useState({});
     const [error, setError] = useState('');
     const [user, setUser] = useState('');
+    const [points, setPoints] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchUserAndEvents = async () => {
-            try {
-                const eventsRes = await axios.get('http://localhost:8001/home', { withCredentials: true });
-                setUser(eventsRes.data.user.username);
-                if (eventsRes.data.events) {
-                    setEvents(eventsRes.data.events);
-                }
-            } catch (err) {
-                setError('Nie udało się załadować danych');
-            } finally {
-                setLoading(false);
+    const fetchUserAndEvents = async () => {
+        try {
+            const eventsRes = await axios.get('http://localhost:8001/api/home', { withCredentials: true });
+            setUser(eventsRes.data.user.username);
+            setPoints(eventsRes.data.user.points);
+            if (eventsRes.data.events) {
+                setEvents(eventsRes.data.events);
             }
-        };
+        } catch (err) {
+            setError('Nie udało się załadować danych');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchUserAndEvents();
     }, []);
 
@@ -33,15 +35,26 @@ function Home() {
         try {
             const betAmount = parseFloat(betAmounts[eventId]) || 0;
             const betChoice = betChoices[eventId] || 'home';
-
-            const response = await axios.post('http://localhost:8001/place-bet', {
+            const eventData = {
                 event_id: eventId,
                 bet_amount: betAmount,
                 bet_choice: betChoice,
-            }, { withCredentials: true });
+            };
+
+            const response = await axios.post('http://localhost:8001/api/place_bet',
+                eventData,
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
 
             if (response.data.success) {
                 alert(`Bet placed! Potential win: ${response.data.potential_win}`);
+                setBetAmounts({ ...betAmounts, [eventId]: '' }); // czyść input
+                fetchUserAndEvents(); // odśwież dane na stronie
             } else {
                 setError(response.data.error);
             }
@@ -52,7 +65,7 @@ function Home() {
 
     const handleLogout = async () => {
         try {
-            await axios.post('http://localhost:8001/logout', {}, { withCredentials: true });
+            await axios.post('http://localhost:8001/api/logout', {}, { withCredentials: true });
             navigate('/login');
         } catch (err) {
             setError('Error logging out');
@@ -72,7 +85,7 @@ function Home() {
 
     return (
         <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '50px' }}>
-            <h2>Witaj, {user}</h2>
+            <h2>Witaj, {user} masz {loading ? '...' : points} punktów</h2>
             <h3>Wydarzenia</h3>
 
             {loading ? (
@@ -82,7 +95,7 @@ function Home() {
                     {events.length > 0 ? (
                         events.map((event) => (
                             <div key={event.id} style={{ borderBottom: '1px solid #ccc', marginBottom: '15px', paddingBottom: '10px' }}>
-                                <p><strong>{event.home_team}</strong> vs <strong>{event.away_team}</strong></p>
+                                <p><strong>{event.event_name}</strong></p>
                                 <p>Data: {formatDate(event.event_date)}</p>
                                 <p>Kursy: Dom {event.home_odds.toFixed(2)} | Goście {event.away_odds.toFixed(2)} | Remis {event.draw_odds.toFixed(2)}</p>
 

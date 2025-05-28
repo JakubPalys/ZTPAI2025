@@ -39,7 +39,7 @@ class AdminController extends AbstractController
         return null;
     }
 
-    #[Route('/admin', name: 'admin_menu')]
+    #[Route('/api/admin', name: 'admin_menu')]
     public function adminMenu(): JsonResponse
     {
         $checkAdminResponse = $this->checkAdmin();
@@ -76,7 +76,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/add-event', name: 'admin_add_event', methods: ['POST'])]
+    #[Route('/api/admin/add-event', name: 'admin_add_event', methods: ['POST'])]
     public function addEvent(Request $request): JsonResponse
     {
         $checkAdminResponse = $this->checkAdmin();
@@ -94,7 +94,7 @@ class AdminController extends AbstractController
         return $this->json(['success' => 'Event added successfully']);
     }
 
-    #[Route('/admin/delete-event', name: 'admin_delete_event', methods: ['POST'])]
+    #[Route('/api/admin/delete-event', name: 'admin_delete_event', methods: ['POST'])]
     public function deleteEvent(Request $request): JsonResponse
     {
         $checkAdminResponse = $this->checkAdmin();
@@ -113,7 +113,7 @@ class AdminController extends AbstractController
         return $this->json(['error' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 
-    #[Route('/admin/finish-event', name: 'admin_finish_event', methods: ['POST'])]
+    #[Route('/api/admin/finish-event', name: 'admin_finish_event', methods: ['POST'])]
     public function finishEvent(Request $request): JsonResponse
     {
         $checkAdminResponse = $this->checkAdmin();
