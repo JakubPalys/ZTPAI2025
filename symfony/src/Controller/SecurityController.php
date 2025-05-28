@@ -104,7 +104,8 @@ public function register(Request $request, EntityManagerInterface $em, UserRepos
         $user->setUsername($data['name']);
         $user->setEmail($data['email']);
         $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
-
+        $user->setPoints(1000);
+        
         $role = $userRoleRepository->findOneBy(['role_name' => 'user']);
         if (!$role) {
             return $this->json(['error' => 'Nie znaleziono roli user'], 500);
