@@ -31,15 +31,6 @@ class HomeController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/', name: 'index')]
-    public function index(SessionInterface $session): JsonResponse
-    {
-        if (!$session->get('user')) {
-            return $this->json(['error' => 'User not logged in'], 401);
-        }
-        return $this->json(['redirect' => $this->generateUrl('home')]);
-    }
-
     #[Route('/api/home', name: 'home')]
     public function home(SessionInterface $session, UserRepository $userRepository): JsonResponse
     {
