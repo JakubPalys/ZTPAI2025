@@ -77,39 +77,39 @@ public function profile(SessionInterface $session): JsonResponse
     ]);
 }
 
-    #[Route('/api/profile/change-password', name: 'change_password', methods: ['POST'])]
-    public function changePassword(Request $request, SessionInterface $session): JsonResponse
-    {
-        $userId = $session->get('user_id');
-        if (!$userId) {
-            return $this->json(['error' => 'User not authenticated'], 401);
-        }
-
-        $user = $this->userRepository->find($userId);
-        if (!$user) {
-            return $this->json(['error' => 'User not found'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-
-        $oldPassword = $data['old_password'] ?? null;
-        $newPassword = $data['new_password'] ?? null;
-        $confirmPassword = $data['confirm_password'] ?? null;
-
-        if (!$this->passwordHasher->isPasswordValid($user, $oldPassword)) {
-            return $this->json(['error' => 'Old password is incorrect'], 400);
-        }
-
-        if ($newPassword !== $confirmPassword) {
-            return $this->json(['error' => 'Passwords do not match'], 400);
-        }
-
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $newPassword);
-        $user->setPassword($hashedPassword);
-        $this->entityManager->flush();
-
-        return $this->json(['success' => 'Password changed successfully']);
+   #[Route('/api/profile/change-password', name: 'change_password', methods: ['POST'])]
+public function changePassword(Request $request, SessionInterface $session): JsonResponse
+{
+    $userId = $session->get('user_id');
+    if (!$userId) {
+        return $this->json(['error' => 'User not authenticated'], 401);
     }
+
+    $user = $this->userRepository->find($userId);
+    if (!$user) {
+        return $this->json(['error' => 'User not found'], 404);
+    }
+
+    $data = json_decode($request->getContent(), true);
+
+    $oldPassword = $data['old_password'] ?? null;
+    $newPassword = $data['new_password'] ?? null;
+    $confirmPassword = $data['confirm_password'] ?? null;
+
+    if (!password_verify($oldPassword, $user->getPasswordHash())) {
+        return $this->json(['error' => 'Old password is incorrect'], 400);
+    }
+
+    if ($newPassword !== $confirmPassword) {
+        return $this->json(['error' => 'Passwords do not match'], 400);
+    }
+
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+    $user->setPasswordHash($hashedPassword);
+    $this->entityManager->flush();
+
+    return $this->json(['success' => 'Password changed successfully']);
+}
 
     #[Route('/api/profile/delete', name: 'delete_account', methods: ['POST'])]
     public function deleteAccount(SessionInterface $session): JsonResponse

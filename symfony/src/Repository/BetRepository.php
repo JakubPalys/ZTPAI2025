@@ -14,7 +14,7 @@ class BetRepository extends ServiceEntityRepository
     }
 
    public function getSortedBetsByUser(int $userId, int $statusId): array
-{
+    {
     return $this->createQueryBuilder('b')
         ->select('b', 'e.eventName AS event_name')
         ->innerJoin('b.event', 'e')
@@ -25,5 +25,15 @@ class BetRepository extends ServiceEntityRepository
         ->orderBy('b.bet_date', 'DESC')
         ->getQuery()
         ->getArrayResult();
-}
+    }
+
+    public function deleteBetsByUserId(int $userId): void
+    {
+        $qb = $this->createQueryBuilder('b');
+        $qb->delete()
+            ->where('b.user = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->execute();
+    }
 }
