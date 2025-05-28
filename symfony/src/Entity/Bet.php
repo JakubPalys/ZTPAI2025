@@ -34,6 +34,9 @@ class Bet
     #[ORM\Column(type: "float")]
     private float $potential_win;
 
+    #[ORM\Column(type: "integer")]
+    private int $outcome;
+
 
     public function getBetId(): ?int
     {
@@ -109,6 +112,17 @@ class Bet
     public function setPotentialWin(float $potential_win): self
     {
         $this->potential_win = $potential_win;
+        return $this;
+    }
+
+    public function getOutcome(): int
+    {
+        return $this->outcome;
+    }
+
+    public function setOutcome(int $outcome): self
+    {
+        $this->outcome = $$outcome;
         return $this;
     }
 }

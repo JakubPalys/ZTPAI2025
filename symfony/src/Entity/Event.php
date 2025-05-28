@@ -31,6 +31,10 @@ class Event
     #[ORM\Column(name: 'draw_odds', type: 'float')]
     private float $drawOdds;
 
+    #[ORM\ManyToOne(targetEntity: Result::class)]
+    #[ORM\JoinColumn(name: "result_id", referencedColumnName: "result_id", nullable: true)]
+    private ?Result $result = null;
+
     public function getId(): int
     {
         return $this->id;
