@@ -56,7 +56,7 @@ function Login() {
                     src={logo}
                     alt="Bettson"
                     style={{
-                        width: 500, 
+                        width: 300, 
                         maxWidth: '90%',
                         marginBottom: 38,
                         filter: 'brightness(0) invert(1)',  
