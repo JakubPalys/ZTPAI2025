@@ -3,6 +3,65 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.svg';
 
+const styleSheet = `
+@media (max-width: 900px) {
+  .profile-container {
+    max-width: 99vw !important;
+    padding: 22px 5px 24px 5px !important;
+  }
+  .profile-logo {
+    width: 120px !important;
+    margin-bottom: 14px !important;
+  }
+  .profile-card {
+    padding: 10px 8px !important;
+  }
+  .profile-bet-card {
+    padding: 12px 10px 10px 10px !important;
+    font-size: 13px !important;
+  }
+  .profile-title {
+    font-size: 1.15rem !important;
+  }
+  .profile-btn {
+    font-size: 13px !important;
+    padding: 10px 0 !important;
+  }
+  .profile-input {
+    font-size: 13px !important;
+    padding: 9px 9px !important;
+  }
+}
+@media (max-width: 600px) {
+  .profile-container {
+    max-width: 100vw !important;
+    padding: 7px 1vw 11px 1vw !important;
+  }
+  .profile-logo {
+    width: 85px !important;
+    margin-bottom: 10px !important;
+  }
+  .profile-card {
+    padding: 7px 3px !important;
+  }
+  .profile-bet-card {
+    padding: 8px 5px 7px 5px !important;
+    font-size: 11px !important;
+  }
+  .profile-title {
+    font-size: 1.0rem !important;
+  }
+  .profile-btn {
+    font-size: 11px !important;
+    padding: 7px 0 !important;
+  }
+  .profile-input {
+    font-size: 11px !important;
+    padding: 7px 6px !important;
+  }
+}
+`;
+
 function Profile() {
     const [user, setUser] = useState(null);
     const [activeBets, setActiveBets] = useState([]);
@@ -17,8 +76,13 @@ function Profile() {
     const [successMsg, setSuccessMsg] = useState('');
 
     useEffect(() => {
+        if (!document.getElementById('profile-responsive-styles')) {
+            const style = document.createElement('style');
+            style.textContent = styleSheet;
+            style.id = 'profile-responsive-styles';
+            document.head.appendChild(style);
+        }
         fetchProfile();
-
     }, []);
 
     const fetchProfile = async () => {
@@ -168,7 +232,8 @@ function Profile() {
         marginLeft: 10,
         border: outcome === 1 ? '1.5px solid #fff' : undefined,
         textShadow: outcome === 1 ? '0 1px 4px rgba(17,153,142,0.4)' : undefined
-});
+    });
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -189,6 +254,7 @@ function Profile() {
                 <img
                     src={logo}
                     alt="Bettson"
+                    className="profile-logo"
                     style={{
                         width: 180,
                         height: 'auto',
@@ -206,7 +272,7 @@ function Profile() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <div style={{
+                <div className="profile-container" style={{
                     maxWidth: '600px',
                     width: '100%',
                     background: 'rgba(24,25,26,0.98)',
@@ -215,7 +281,7 @@ function Profile() {
                     padding: '30px 40px 40px 40px',
                     margin: '0 auto'
                 }}>
-                    <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 18 }}>Profil</h2>
+                    <h2 className="profile-title" style={{ color: '#fff', fontWeight: 600, marginBottom: 18 }}>Profil</h2>
                     {loading ? (
                         <p style={{ color: '#bbb' }}>Ładowanie...</p>
                     ) : error ? (
@@ -223,7 +289,7 @@ function Profile() {
                     ) : (
                         <>
                             {user && (
-                                <div style={{
+                                <div className="profile-card" style={{
                                     marginBottom: 24,
                                     background: 'rgba(44,45,46,0.92)',
                                     borderRadius: 10,
@@ -243,7 +309,7 @@ function Profile() {
                             ) : (
                                 <div style={{ marginBottom: 18 }}>
                                     {activeBets.map((bet, idx) => (
-                                        <div key={idx} style={betCardStyle()}>
+                                        <div key={idx} className="profile-bet-card" style={betCardStyle()}>
                                             <div style={{ fontWeight: 600, fontSize: 17, color: '#fff', marginBottom: 2 }}>
                                                 {bet.event_name || 'N/A'}
                                                 <span style={badgeStyle(bet.bet_choice)}>{bet.bet_choice === 'home' ? 'Dom' : bet.bet_choice === 'draw' ? 'Remis' : 'Goście'}</span>
@@ -264,7 +330,7 @@ function Profile() {
                             ) : (
                                 <div style={{ marginBottom: 18 }}>
                                     {completedBets.map((bet, idx) => (
-                                        <div key={idx} style={betCardStyle(bet.outcome)}>
+                                        <div key={idx} className="profile-bet-card" style={betCardStyle(bet.outcome)}>
                                             <div style={{ fontWeight: 600, fontSize: 17, color: '#fff', marginBottom: 2 }}>
                                                 {bet.event_name || 'N/A'}
                                                 <span style={badgeStyle(bet.bet_choice)}>{bet.bet_choice === 'home' ? 'Dom' : bet.bet_choice === 'draw' ? 'Remis' : 'Goście'}</span>
@@ -291,6 +357,7 @@ function Profile() {
                                         value={oldPassword}
                                         onChange={e => setOldPassword(e.target.value)}
                                         required
+                                        className="profile-input"
                                         style={{
                                             width: '100%',
                                             padding: '12px 14px',
@@ -311,6 +378,7 @@ function Profile() {
                                         value={newPassword}
                                         onChange={e => setNewPassword(e.target.value)}
                                         required
+                                        className="profile-input"
                                         style={{
                                             width: '100%',
                                             padding: '12px 14px',
@@ -331,6 +399,7 @@ function Profile() {
                                         value={confirmPassword}
                                         onChange={e => setConfirmPassword(e.target.value)}
                                         required
+                                        className="profile-input"
                                         style={{
                                             width: '100%',
                                             padding: '12px 14px',
@@ -345,6 +414,7 @@ function Profile() {
                                 </div>
                                 <button
                                     type="submit"
+                                    className="profile-btn"
                                     style={{
                                         width: '100%',
                                         padding: '13px 0',
@@ -366,6 +436,7 @@ function Profile() {
 
                             <h3 style={{ color: '#fff', marginBottom: 8 }}>Strefa niebezpieczna</h3>
                             <button
+                                className="profile-btn"
                                 style={{
                                     width: '100%',
                                     padding: '13px 0',

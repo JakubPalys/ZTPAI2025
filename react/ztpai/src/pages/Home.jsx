@@ -3,6 +3,68 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 
+const styleSheet = `
+@media (max-width: 1200px) {
+  .home-content {
+    max-width: 98vw !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+@media (max-width: 900px) {
+  .home-content {
+    max-width: 100vw !important;
+    padding: 18px 5px 28px 5px !important;
+  }
+  .home-logo {
+    width: 120px !important;
+  }
+  .home-action-btn, .home-logout-btn {
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+  }
+  .home-event-box {
+    padding: 14px 8px 10px 8px !important;
+  }
+  .home-event-box p {
+    font-size: 14px !important;
+  }
+}
+@media (max-width: 600px) {
+  .home-content {
+    max-width: 100vw !important;
+    padding: 8px 2px 15px 2px !important;
+  }
+  .home-logo {
+    width: 85px !important;
+  }
+  .home-action-btn, .home-logout-btn {
+    font-size: 11px !important;
+    padding: 6px 7px !important;
+  }
+  .home-content h2, .home-content h3 {
+    font-size: 1.0rem !important;
+  }
+  .home-event-box {
+    padding: 8px 4px 7px 4px !important;
+  }
+  .home-event-box p {
+    font-size: 11px !important;
+  }
+}
+@media (max-width: 450px) {
+  .home-content {
+    padding: 0px 0px 12px 0px !important;
+  }
+  .home-content h2, .home-content h3 {
+    font-size: 0.95rem !important;
+  }
+  .home-event-box p {
+    font-size: 9.5px !important;
+  }
+}
+`;
+
 function Home() {
     const [events, setEvents] = useState([]);
     const [betAmounts, setBetAmounts] = useState({});
@@ -13,6 +75,15 @@ function Home() {
     const [points, setPoints] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!document.getElementById('home-responsive-styles')) {
+            const style = document.createElement('style');
+            style.textContent = styleSheet;
+            style.id = 'home-responsive-styles';
+            document.head.appendChild(style);
+        }
+    }, []);
 
     const fetchUserAndEvents = async () => {
         try {
@@ -36,7 +107,6 @@ function Home() {
 
     useEffect(() => {
         fetchUserAndEvents();
-
     }, []);
 
     const handleBet = async (eventId) => {
@@ -123,6 +193,7 @@ function Home() {
                 <img
                     src={logo}
                     alt="Bettson"
+                    className="home-logo"
                     style={{
                         width: 180,
                         height: 'auto',
@@ -141,15 +212,17 @@ function Home() {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-                <div style={{
-                    maxWidth: '820px',
-                    width: '100%',
-                    background: 'rgba(24,25,26,0.98)',
-                    borderRadius: '18px',
-                    boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
-                    padding: '30px 40px 40px 40px',
-                    margin: '0 auto'
-                }}>
+                <div
+                    className="home-content"
+                    style={{
+                        maxWidth: '820px',
+                        width: '100%',
+                        background: 'rgba(24,25,26,0.98)',
+                        borderRadius: '18px',
+                        boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
+                        padding: '30px 40px 40px 40px',
+                        margin: '0 auto'
+                    }}>
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -163,6 +236,7 @@ function Home() {
                         </h2>
                         <button
                             onClick={goToProfile}
+                            className="home-action-btn"
                             style={{
                                 height: '38px',
                                 padding: '0 24px',
@@ -183,6 +257,7 @@ function Home() {
                         {role === 'admin' && (
                             <button
                                 onClick={goToAdmin}
+                                className="home-action-btn"
                                 style={{
                                     height: '38px',
                                     padding: '0 24px',
@@ -210,7 +285,7 @@ function Home() {
                         <div>
                             {events.length > 0 ? (
                                 events.map((event) => (
-                                    <div key={event.id} style={{
+                                    <div key={event.id} className="home-event-box" style={{
                                         borderBottom: '1px solid #313131',
                                         marginBottom: '18px',
                                         paddingBottom: '14px',
@@ -262,6 +337,7 @@ function Home() {
                                             </select>
                                             <button
                                                 onClick={() => handleBet(event.id)}
+                                                className="home-action-btn"
                                                 style={{
                                                     padding: '10px 18px',
                                                     borderRadius: 6,
@@ -291,6 +367,7 @@ function Home() {
             </div>
             <button
                 onClick={handleLogout}
+                className="home-logout-btn"
                 style={{
                     position: 'fixed',
                     bottom: '12px',

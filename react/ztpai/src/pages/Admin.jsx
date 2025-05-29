@@ -3,6 +3,68 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.svg';
 
+const styleSheet = `
+@media (max-width: 1200px) {
+  .admin-content {
+    max-width: 98vw !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+@media (max-width: 900px) {
+  .admin-content {
+    max-width: 100vw !important;
+    padding: 18px 5px 28px 5px !important;
+  }
+  .admin-table th,
+  .admin-table td {
+    font-size: 13px !important;
+    padding: 6px !important;
+  }
+  .admin-logo {
+    width: 120px !important;
+  }
+  .admin-action-btn {
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+  }
+}
+@media (max-width: 600px) {
+  .admin-content {
+    max-width: 100vw !important;
+    padding: 8px 2px 15px 2px !important;
+  }
+  .admin-table th,
+  .admin-table td {
+    font-size: 11px !important;
+    padding: 4px !important;
+  }
+  .admin-logo {
+    width: 85px !important;
+  }
+  .admin-action-btn {
+    font-size: 11px !important;
+    padding: 6px 7px !important;
+  }
+  .admin-content h2 {
+    font-size: 1.0rem !important;
+  }
+}
+@media (max-width: 450px) {
+  .admin-content {
+    padding: 0px 0px 12px 0px !important;
+  }
+  .admin-content h2 {
+    font-size: 0.95rem !important;
+  }
+  .admin-table th,
+  .admin-table td {
+    font-size: 9.5px !important;
+    padding: 2px !important;
+  }
+}
+`;
+
 const BET_RESULTS = [
   { result_id: 1, result_name: 'home' },
   { result_id: 2, result_name: 'draw' },
@@ -31,6 +93,15 @@ function Admin() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!document.getElementById('admin-responsive-styles')) {
+      const style = document.createElement('style');
+      style.textContent = styleSheet;
+      style.id = 'admin-responsive-styles';
+      document.head.appendChild(style);
+    }
+  }, []);
+
   const fetchEvents = () => {
     axios
       .get('http://localhost:8001/api/admin', { withCredentials: true })
@@ -54,7 +125,6 @@ function Admin() {
 
   useEffect(() => {
     fetchEvents();
-
   }, [navigate]);
 
   const handleSubmit = async (e) => {
@@ -190,6 +260,7 @@ function Admin() {
         <img
           src={logo}
           alt="Bettson"
+          className="admin-logo"
           style={{
             width: 180,
             height: 'auto',
@@ -209,6 +280,7 @@ function Admin() {
       }}>
         <button
           onClick={goToAdminUsers}
+          className="admin-action-btn"
           style={{
             padding: '12px 24px',
             borderRadius: 7,
@@ -232,15 +304,17 @@ function Admin() {
         flexDirection: 'column',
         alignItems: 'center'
       }}>
-        <div style={{
-          maxWidth: '820px',
-          width: '100%',
-          background: 'rgba(24,25,26,0.98)',
-          borderRadius: '18px',
-          boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
-          padding: '30px 40px 40px 40px',
-          margin: '0 auto'
-        }}>
+        <div
+          className="admin-content"
+          style={{
+            maxWidth: '820px',
+            width: '100%',
+            background: 'rgba(24,25,26,0.98)',
+            borderRadius: '18px',
+            boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
+            padding: '30px 40px 40px 40px',
+            margin: '0 auto'
+          }}>
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Zakończ wydarzenie i rozlicz zakłady</h2>
           <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
             <div style={{ marginBottom: 12 }}>
@@ -284,6 +358,7 @@ function Admin() {
             <button
               type="submit"
               disabled={status === 'Wysyłanie...'}
+              className="admin-action-btn"
               style={{
                 padding: '10px 22px',
                 borderRadius: 7,
@@ -388,6 +463,7 @@ function Admin() {
             <button
               type="submit"
               disabled={addEventStatus === 'Wysyłanie...'}
+              className="admin-action-btn"
               style={{
                 padding: '10px 22px',
                 borderRadius: 7,
@@ -430,6 +506,7 @@ function Admin() {
             <button
               type="submit"
               disabled={deleteEventStatus === 'Usuwanie...'}
+              className="admin-action-btn"
               style={{
                 padding: '10px 22px',
                 borderRadius: 7,
@@ -468,6 +545,7 @@ function Admin() {
             <button
               type="submit"
               disabled={addPointsStatus === 'Wysyłanie...'}
+              className="admin-action-btn"
               style={{
                 padding: '10px 22px',
                 borderRadius: 7,
@@ -489,7 +567,7 @@ function Admin() {
           <hr style={{ margin: '2em 0', borderColor: '#222' }} />
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Lista wydarzeń</h2>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{
+            <table className="admin-table" style={{
               width: "100%",
               borderCollapse: "collapse",
               background: 'rgba(44,45,46,0.92)',

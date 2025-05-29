@@ -3,12 +3,73 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/logo.svg";
 
+const styleSheet = `
+@media (max-width: 1200px) {
+  .userslist-content {
+    max-width: 98vw !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+@media (max-width: 900px) {
+  .userslist-content {
+    max-width: 100vw !important;
+    padding: 18px 5px 28px 5px !important;
+  }
+  .userslist-table th,
+  .userslist-table td {
+    font-size: 13px !important;
+    padding: 6px !important;
+  }
+  .userslist-logo {
+    width: 120px !important;
+  }
+}
+@media (max-width: 600px) {
+  .userslist-content {
+    max-width: 100vw !important;
+    padding: 8px 2px 15px 2px !important;
+  }
+  .userslist-table th,
+  .userslist-table td {
+    font-size: 11px !important;
+    padding: 4px !important;
+  }
+  .userslist-logo {
+    width: 85px !important;
+  }
+  .userslist-content h2 {
+    font-size: 1.0rem !important;
+  }
+}
+@media (max-width: 450px) {
+  .userslist-content {
+    padding: 0px 0px 12px 0px !important;
+  }
+  .userslist-content h2 {
+    font-size: 0.95rem !important;
+  }
+  .userslist-table th,
+  .userslist-table td {
+    font-size: 9.5px !important;
+    padding: 2px !important;
+  }
+}
+`;
+
 function UsersList() {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (!document.getElementById('userslist-responsive-styles')) {
+            const style = document.createElement('style');
+            style.textContent = styleSheet;
+            style.id = 'userslist-responsive-styles';
+            document.head.appendChild(style);
+        }
+
         axios.get("http://localhost:8001/api/admin/users", { withCredentials: true })
             .then(response => {
                 setUsers(response.data.users || []);
@@ -22,7 +83,7 @@ function UsersList() {
                 }
             });
 
-    }, []);
+    }, [navigate]);
 
     const goToHome = () => {
         navigate('/home');
@@ -49,6 +110,7 @@ function UsersList() {
                 <img
                     src={logo}
                     alt="Bettson"
+                    className="userslist-logo"
                     style={{
                         width: 180,
                         height: 'auto',
@@ -66,7 +128,7 @@ function UsersList() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <div style={{
+                <div className="userslist-content" style={{
                     maxWidth: '820px',
                     width: '100%',
                     background: 'rgba(24,25,26,0.98)',
@@ -81,7 +143,7 @@ function UsersList() {
                         <p style={{ color: "#bbb" }}>Brak użytkowników do wyświetlenia.</p>
                     ) : (
                         <div style={{ overflowX: 'auto' }}>
-                            <table style={{
+                            <table className="userslist-table" style={{
                                 width: "100%",
                                 borderCollapse: "collapse",
                                 background: 'rgba(44,45,46,0.92)',

@@ -3,6 +3,57 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/logo.svg";
 
+const styleSheet = `
+@media (max-width: 900px) {
+  .userdetails-container {
+    max-width: 97vw !important;
+    padding: 22px 5px 24px 5px !important;
+  }
+  .userdetails-logo {
+    width: 120px !important;
+    margin-bottom: 14px !important;
+  }
+  .userdetails-card {
+    padding: 10px 8px !important;
+  }
+  .userdetails-title {
+    font-size: 1.15rem !important;
+  }
+  .userdetails-btn {
+    font-size: 13px !important;
+    padding: 10px 0 !important;
+  }
+  .userdetails-input {
+    font-size: 13px !important;
+    padding: 9px 9px !important;
+  }
+}
+@media (max-width: 600px) {
+  .userdetails-container {
+    max-width: 100vw !important;
+    padding: 7px 1vw 11px 1vw !important;
+  }
+  .userdetails-logo {
+    width: 85px !important;
+    margin-bottom: 10px !important;
+  }
+  .userdetails-card {
+    padding: 7px 3px !important;
+  }
+  .userdetails-title {
+    font-size: 1.0rem !important;
+  }
+  .userdetails-btn {
+    font-size: 11px !important;
+    padding: 7px 0 !important;
+  }
+  .userdetails-input {
+    font-size: 11px !important;
+    padding: 7px 6px !important;
+  }
+}
+`;
+
 function UserDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -18,6 +69,12 @@ function UserDetails() {
     const [points, setPoints] = useState("");
 
     useEffect(() => {
+        if (!document.getElementById('userdetails-responsive-styles')) {
+            const style = document.createElement('style');
+            style.textContent = styleSheet;
+            style.id = 'userdetails-responsive-styles';
+            document.head.appendChild(style);
+        }
         axios.get(`http://localhost:8001/api/admin/users/${id}`, { withCredentials: true })
             .then(response => {
                 setUser(response.data);
@@ -35,7 +92,7 @@ function UserDetails() {
                 }
             });
 
-    }, [id]);
+    }, [id, navigate]);
 
     const handleEdit = () => setEditMode(true);
 
@@ -120,6 +177,7 @@ function UserDetails() {
                 <img
                     src={logo}
                     alt="Bettson"
+                    className="userdetails-logo"
                     style={{
                         width: 180,
                         height: 'auto',
@@ -137,7 +195,7 @@ function UserDetails() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <div style={{
+                <div className="userdetails-container" style={{
                     maxWidth: '520px',
                     width: '100%',
                     background: 'rgba(24,25,26,0.98)',
@@ -146,7 +204,7 @@ function UserDetails() {
                     padding: '30px 40px 40px 40px',
                     margin: '0 auto'
                 }}>
-                    <h2 style={{ color: "#fff", marginBottom: 26 }}>Szczegóły użytkownika</h2>
+                    <h2 className="userdetails-title" style={{ color: "#fff", marginBottom: 26 }}>Szczegóły użytkownika</h2>
                     {editMode ? (
                         <form onSubmit={handleSave}>
                             <div style={{ marginBottom: 14 }}>
@@ -156,6 +214,7 @@ function UserDetails() {
                                         value={username}
                                         onChange={e => setUsername(e.target.value)}
                                         required
+                                        className="userdetails-input"
                                         style={{
                                             width: '100%',
                                             padding: '10px 12px',
@@ -178,6 +237,7 @@ function UserDetails() {
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
                                         required
+                                        className="userdetails-input"
                                         style={{
                                             width: '100%',
                                             padding: '10px 12px',
@@ -199,6 +259,7 @@ function UserDetails() {
                                         value={role}
                                         onChange={e => setRole(e.target.value)}
                                         required
+                                        className="userdetails-input"
                                         style={{
                                             width: '100%',
                                             padding: '10px 12px',
@@ -221,6 +282,7 @@ function UserDetails() {
                                         value={points}
                                         onChange={e => setPoints(e.target.value)}
                                         required
+                                        className="userdetails-input"
                                         style={{
                                             width: '100%',
                                             padding: '10px 12px',
@@ -238,6 +300,7 @@ function UserDetails() {
                             <div style={{ display: "flex", gap: 12 }}>
                                 <button
                                     type="submit"
+                                    className="userdetails-btn"
                                     style={{
                                         flex: 1,
                                         padding: '13px 0',
@@ -257,6 +320,7 @@ function UserDetails() {
                                 <button
                                     type="button"
                                     onClick={handleCancel}
+                                    className="userdetails-btn"
                                     style={{
                                         flex: 1,
                                         padding: '13px 0',
@@ -277,7 +341,7 @@ function UserDetails() {
                         </form>
                     ) : (
                         <>
-                            <div style={{
+                            <div className="userdetails-card" style={{
                                 marginBottom: 22,
                                 background: 'rgba(44,45,46,0.92)',
                                 borderRadius: 10,
@@ -293,6 +357,7 @@ function UserDetails() {
                             <div style={{ display: "flex", gap: 12 }}>
                                 <button
                                     onClick={handleEdit}
+                                    className="userdetails-btn"
                                     style={{
                                         flex: 1,
                                         padding: '13px 0',
@@ -311,6 +376,7 @@ function UserDetails() {
                                 </button>
                                 <button
                                     onClick={handleDelete}
+                                    className="userdetails-btn"
                                     style={{
                                         flex: 1,
                                         padding: '13px 0',
