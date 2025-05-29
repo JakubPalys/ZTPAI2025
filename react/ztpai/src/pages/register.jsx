@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -9,6 +9,16 @@ function Register() {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+            const logout = async () => {
+                try {
+                    await axios.post('http://localhost:8001/api/logout', {}, { withCredentials: true });
+                } catch (err) {
+                }
+            };
+            logout();
+        }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();

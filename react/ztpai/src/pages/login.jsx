@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import logo from '../assets/logo.svg';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -8,9 +9,17 @@ function Login() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const logout = async () => {
+            try {
+                await axios.post('http://localhost:8001/api/logout', {}, { withCredentials: true });
+            } catch (err) {}
+        };
+        logout();
+    }, []);
+
     const handleLogin = async (e) => {
         e.preventDefault();
-
         try {
             const response = await axios.post('http://localhost:8001/api/login', { email, password },{ withCredentials: true });
             alert(response.data.message);
@@ -22,33 +31,122 @@ function Login() {
     };
 
     return (
-        <div>
-            <h2>Logowanie</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Hasło</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit">Zaloguj się</button>
-            </form>
-            <p>Nie masz konta? <a href="/register">Zarejestruj się</a></p>
+        <div style={{
+            minHeight: '100vh',
+            minWidth: '100vw',
+            background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'Inter, Arial, sans-serif'
+        }}>
+            <div style={{
+                background: '#18191A',
+                borderRadius: '18px',
+                boxShadow: '0 8px 40px 0 rgba(0,0,0,0.22)',
+                padding: '64px 56px 48px 56px',
+                minWidth: 400,
+                width: 420,
+                maxWidth: '95vw',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
+                <img
+                    src={logo}
+                    alt="Bettson"
+                    style={{
+                        width: 500, 
+                        maxWidth: '90%',
+                        marginBottom: 38,
+                        filter: 'brightness(0) invert(1)',  
+                        display: 'block',
+                        marginLeft: 'auto',
+                        marginRight: 'auto',
+                        transition: 'width 0.2s'
+                    }}
+                />
+                <h2 style={{
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: 32,
+                    marginBottom: 24,
+                    letterSpacing: 2
+                }}>Logowanie</h2>
+                {error && <p style={{ color: '#FF5252', marginBottom: 18, fontSize: 16 }}>{error}</p>}
+                <form onSubmit={handleLogin} style={{ width: '100%' }}>
+                    <div style={{ marginBottom: 22 }}>
+                        <label htmlFor="email" style={{ color: '#bbb', fontSize: 16, marginBottom: 6, display: 'block' }}>Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            autoComplete="username"
+                            style={{
+                                width: '100%',
+                                padding: '14px 15px',
+                                borderRadius: 8,
+                                border: '1.5px solid #333',
+                                background: '#232526',
+                                color: '#fff',
+                                fontSize: 17,
+                                outline: 'none',
+                                transition: 'border 0.2s',
+                                marginTop: 2
+                            }}
+                        />
+                    </div>
+                    <div style={{ marginBottom: 32 }}>
+                        <label htmlFor="password" style={{ color: '#bbb', fontSize: 16, marginBottom: 6, display: 'block' }}>Hasło</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            autoComplete="current-password"
+                            style={{
+                                width: '100%',
+                                padding: '14px 15px',
+                                borderRadius: 8,
+                                border: '1.5px solid #333',
+                                background: '#232526',
+                                color: '#fff',
+                                fontSize: 17,
+                                outline: 'none',
+                                transition: 'border 0.2s',
+                                marginTop: 2
+                            }}
+                        />
+                    </div>
+                    <button type="submit" style={{
+                        width: '100%',
+                        padding: '15px 0',
+                        border: 'none',
+                        borderRadius: 8,
+                        background: 'linear-gradient(90deg, #2c2c2e 0%, #1f1f1f 100%)',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: 18,
+                        letterSpacing: 1,
+                        boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                    }}>
+                        Zaloguj się
+                    </button>
+                </form>
+                <p style={{ color: '#aaa', marginTop: 28, fontSize: 15 }}>
+                    Nie masz konta?{' '}
+                    <a href="/register" style={{
+                        color: '#fff',
+                        textDecoration: 'underline',
+                        fontWeight: 600
+                    }}>Zarejestruj się</a>
+                </p>
+            </div>
         </div>
     );
 }
