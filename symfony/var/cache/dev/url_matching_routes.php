@@ -8,6 +8,7 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
+        '/api/doc' => [[['_route' => 'app.swagger', '_controller' => 'nelmio_api_doc.controller.swagger'], null, ['GET' => 0], null, false, false, null]],
         '/api/admin' => [[['_route' => 'admin_menu', '_controller' => 'App\\Controller\\AdminController::adminMenu'], null, null, null, false, false, null]],
         '/api/admin/add-event' => [[['_route' => 'admin_add_event', '_controller' => 'App\\Controller\\AdminController::addEvent'], null, ['POST' => 0], null, false, false, null]],
         '/api/admin/delete-event' => [[['_route' => 'admin_delete_event', '_controller' => 'App\\Controller\\AdminController::deleteEvent'], null, ['POST' => 0], null, false, false, null]],
