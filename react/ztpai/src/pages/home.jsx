@@ -8,6 +8,7 @@ function Home() {
     const [betChoices, setBetChoices] = useState({});
     const [error, setError] = useState('');
     const [user, setUser] = useState('');
+    const [role, setRole] = useState('');
     const [points, setPoints] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ function Home() {
         try {
             const eventsRes = await axios.get('http://localhost:8001/api/home', { withCredentials: true });
             setUser(eventsRes.data.user.username);
+            setRole(eventsRes.data.user.role);
             setPoints(eventsRes.data.user.points);
             if (eventsRes.data.events) {
                 setEvents(eventsRes.data.events);
@@ -83,9 +85,49 @@ function Home() {
         });
     };
 
+    const goToProfile = () => {
+        navigate('/profile');
+    };
+
+    const goToAdmin = () => {
+        navigate('/admin');
+    };
+
     return (
         <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '50px' }}>
-            <h2>Witaj, {user} masz {loading ? '...' : points} punktów</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <h2>Witaj, {user} masz {loading ? '...' : points} punktów</h2>
+                <button
+                    onClick={goToProfile}
+                    style={{
+                        height: '32px',
+                        padding: '0 15px',
+                        background: '#337ab7',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Profil
+                </button>
+                {role === 'admin' && (
+                    <button
+                        onClick={goToAdmin}
+                        style={{
+                            height: '32px',
+                            padding: '0 15px',
+                            background: '#5cb85c',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Panel admina
+                    </button>
+                )}
+            </div>
             <h3>Wydarzenia</h3>
 
             {loading ? (

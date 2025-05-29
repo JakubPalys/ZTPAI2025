@@ -13,6 +13,7 @@ return [
         '/api/admin/delete-event' => [[['_route' => 'admin_delete_event', '_controller' => 'App\\Controller\\AdminController::deleteEvent'], null, ['POST' => 0], null, false, false, null]],
         '/api/admin/finish-event' => [[['_route' => 'admin_finish_event', '_controller' => 'App\\Controller\\AdminController::finishEvent'], null, ['POST' => 0], null, false, false, null]],
         '/api/admin/users' => [[['_route' => 'admin_list_users', '_controller' => 'App\\Controller\\AdminController::listUsers'], null, ['GET' => 0], null, false, false, null]],
+        '/api/admin/add-points' => [[['_route' => 'admin_add_points', '_controller' => 'App\\Controller\\AdminController::addPointsToAllUsers'], null, ['POST' => 0], null, false, false, null]],
         '/api/home' => [[['_route' => 'home', '_controller' => 'App\\Controller\\HomeController::home'], null, null, null, false, false, null]],
         '/api/place-bet' => [[['_route' => 'place_bet', '_controller' => 'App\\Controller\\HomeController::placeBet'], null, ['POST' => 0], null, false, false, null]],
         '/api/logout' => [[['_route' => 'logout', '_controller' => 'App\\Controller\\HomeController::logout'], null, null, null, false, false, null]],

@@ -69,6 +69,7 @@ class HomeController extends AbstractController
                 'user_id' => $user->getId(),
                 'username' => $user->getUsername(),
                 'points' => $user->getPoints(),
+                'role' => $user->getRole() ? $user->getRole()->getRoleName() : null,
             ],
             'events' => $eventsData,
         ]);

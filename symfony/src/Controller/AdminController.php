@@ -281,4 +281,43 @@ public function finishEvent(Request $request, ResultRepository $resultRepository
 
         return $this->json(['error' => 'Invalid method'], 405);
     }
+
+    #[Route('/api/admin/add-points', name: 'admin_add_points', methods: ['POST'])]
+public function addPointsToAllUsers(Request $request, SessionInterface $session): JsonResponse
+{
+
+    $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
+    if ($checkAdminResponse) {
+        return $checkAdminResponse;
+    }
+   
+    $points = $request->request->get('points');
+    if ($points === null) {
+        $data = json_decode($request->getContent(), true);
+        $points = $data['points'] ?? null;
+    }
+
+    if ($points === null || !is_numeric($points)) {
+        return $this->json(['error' => 'Musisz podać liczbę punktów.'], 400);
+    }
+
+    $points = (int)$points;
+    if ($points === 0) {
+        return $this->json(['error' => 'Liczba punktów nie może być zerowa.'], 400);
+    }
+
+    $users = $this->userRepository->findAll();
+    $count = 0;
+    foreach ($users as $user) {
+        $user->setPoints($user->getPoints() + $points);
+        $count++;
+    }
+    $this->entityManager->flush();
+
+    return $this->json([
+        'success' => "Dodano $points punktów do $count użytkowników.",
+        'points_added' => $points,
+        'users_count' => $count
+    ]);
+}
 }

@@ -27,6 +27,10 @@ function Admin() {
   const [deleteEventId, setDeleteEventId] = useState('');
   const [deleteEventStatus, setDeleteEventStatus] = useState('');
 
+  // Add Points To All Users
+  const [addPoints, setAddPoints] = useState('');
+  const [addPointsStatus, setAddPointsStatus] = useState('');
+
   const navigate = useNavigate();
 
   // Fetch events on mount or after add/delete
@@ -136,6 +140,31 @@ function Admin() {
         setTimeout(() => navigate('/login'), 1000);
       } else {
         setDeleteEventStatus(err.response?.data?.error || 'Błąd przy usuwaniu wydarzenia.');
+      }
+    }
+  };
+
+  // Add Points To All Users
+  const handleAddPoints = async (e) => {
+    e.preventDefault();
+    setAddPointsStatus('Wysyłanie...');
+    try {
+      const response = await axios.post(
+        'http://localhost:8001/api/admin/add-points',
+        { points: addPoints },
+        {
+          withCredentials: true,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      setAddPointsStatus(response.data.success || 'Punkty zostały dodane!');
+      setAddPoints('');
+    } catch (err) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setAddPointsStatus('Brak dostępu. Zaloguj się jako administrator.');
+        setTimeout(() => navigate('/login'), 1000);
+      } else {
+        setAddPointsStatus(err.response?.data?.error || 'Błąd przy dodawaniu punktów.');
       }
     }
   };
@@ -277,6 +306,24 @@ function Admin() {
         </button>
       </form>
       {deleteEventStatus && <div style={{ marginTop: 10 }}>{deleteEventStatus}</div>}
+
+      {/* Panel: Dodaj punkty wszystkim użytkownikom */}
+      <hr style={{ margin: '2em 0' }} />
+      <h2>Dodaj punkty wszystkim użytkownikom</h2>
+      <form onSubmit={handleAddPoints}>
+        <div>
+          <label>Liczba punktów do dodania:</label>
+          <input
+            type="number"
+            value={addPoints}
+            onChange={e => setAddPoints(e.target.value)}
+            required
+            min="1"
+          />
+        </div>
+        <button type="submit" disabled={addPointsStatus === 'Wysyłanie...'}>Dodaj punkty</button>
+      </form>
+      {addPointsStatus && <div style={{ marginTop: 10 }}>{addPointsStatus}</div>}
 
       {/* Tabela wydarzeń */}
       <hr style={{ margin: '2em 0' }} />
