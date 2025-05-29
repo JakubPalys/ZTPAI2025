@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 
 function Home() {
     const [events, setEvents] = useState([]);
@@ -16,6 +17,7 @@ function Home() {
     const fetchUserAndEvents = async () => {
         try {
             const eventsRes = await axios.get('http://localhost:8001/api/home', { withCredentials: true });
+            // Jeśli backend zwraca brak autoryzacji (np. 401), axios rzuci wyjątek i przejdzie do catch
             setUser(eventsRes.data.user.username);
             setRole(eventsRes.data.user.role);
             setPoints(eventsRes.data.user.points);
@@ -23,7 +25,11 @@ function Home() {
                 setEvents(eventsRes.data.events);
             }
         } catch (err) {
-            setError('Nie udało się załadować danych');
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError('Nie udało się załadować danych');
+            }
         } finally {
             setLoading(false);
         }
@@ -31,6 +37,7 @@ function Home() {
 
     useEffect(() => {
         fetchUserAndEvents();
+        // eslint-disable-next-line
     }, []);
 
     const handleBet = async (eventId) => {
@@ -93,92 +100,212 @@ function Home() {
         navigate('/admin');
     };
 
+    const goToHome = () => {
+        navigate('/home');
+    }
+
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <h2>Witaj, {user} masz {loading ? '...' : points} punktów</h2>
-                <button
-                    onClick={goToProfile}
+        <div style={{
+            minHeight: '100vh',
+            minWidth: '100vw',
+            background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+        }}>
+            <div style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '34px 0 20px 0',
+                boxSizing: 'border-box'
+            }}>
+                <img
+                    src={logo}
+                    alt="Bettson"
                     style={{
-                        height: '32px',
-                        padding: '0 15px',
-                        background: '#337ab7',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer'
+                        width: 180,
+                        height: 'auto',
+                        cursor: 'pointer',
+                        filter: 'brightness(0) invert(1)',
+                        transition: 'transform 0.15s',
                     }}
-                >
-                    Profil
-                </button>
-                {role === 'admin' && (
-                    <button
-                        onClick={goToAdmin}
-                        style={{
-                            height: '32px',
-                            padding: '0 15px',
-                            background: '#5cb85c',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Panel admina
-                    </button>
-                )}
+                    onClick={goToHome}
+                    title="Strona główna"
+                />
             </div>
-            <h3>Wydarzenia</h3>
 
-            {loading ? (
-                <p>Ładowanie danych...</p>
-            ) : (
-                <div>
-                    {events.length > 0 ? (
-                        events.map((event) => (
-                            <div key={event.id} style={{ borderBottom: '1px solid #ccc', marginBottom: '15px', paddingBottom: '10px' }}>
-                                <p><strong>{event.event_name}</strong></p>
-                                <p>Data: {formatDate(event.event_date)}</p>
-                                <p>Kursy: Dom {event.home_odds.toFixed(2)} | Goście {event.away_odds.toFixed(2)} | Remis {event.draw_odds.toFixed(2)}</p>
+            <div style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+            }}>
+                <div style={{
+                    maxWidth: '820px',
+                    width: '100%',
+                    background: 'rgba(24,25,26,0.98)',
+                    borderRadius: '18px',
+                    boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
+                    padding: '30px 40px 40px 40px',
+                    margin: '0 auto'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 18,
+                        marginBottom: 16,
+                        flexWrap: 'wrap',
+                        justifyContent: 'center'
+                    }}>
+                        <h2 style={{ color: '#fff', fontWeight: 500, margin: 0 }}>
+                            Witaj, {user} masz {loading ? '...' : points} punktów
+                        </h2>
+                        <button
+                            onClick={goToProfile}
+                            style={{
+                                height: '38px',
+                                padding: '0 24px',
+                                background: 'linear-gradient(90deg, #45484d 0%, #6f7073 100%)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '7px',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                fontSize: 16,
+                                boxShadow: '0 2px 8px 0 rgba(66,134,244,0.10)',
+                                transition: 'background 0.15s'
+                            }}
+                        >
+                            <span role="img" aria-label="profile" style={{ marginRight: 7 }}>👤</span>
+                            Profil
+                        </button>
+                        {role === 'admin' && (
+                            <button
+                                onClick={goToAdmin}
+                                style={{
+                                    height: '38px',
+                                    padding: '0 24px',
+                                    background: 'linear-gradient(90deg, #6c6e70 0%, #434547 100%)',
+                                    color: '#fff',
+                                    border: 'none',
+                                    borderRadius: '7px',
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    fontSize: 16,
+                                    boxShadow: '0 2px 8px 0 rgba(67,206,162,0.10)',
+                                    transition: 'background 0.15s'
+                                }}
+                            >
+                                <span role="img" aria-label="admin" style={{ marginRight: 7 }}>🛠️</span>
+                                Panel admina
+                            </button>
+                        )}
+                    </div>
+                    <h3 style={{ color: '#fff' }}>Wydarzenia</h3>
 
-                                <input
-                                    type="number"
-                                    placeholder="Kwota zakładu"
-                                    value={betAmounts[event.id] || ''}
-                                    onChange={(e) => setBetAmounts({ ...betAmounts, [event.id]: e.target.value })}
-                                    min="1"
-                                />
-                                <select
-                                    value={betChoices[event.id] || 'home'}
-                                    onChange={(e) => setBetChoices({ ...betChoices, [event.id]: e.target.value })}
-                                >
-                                    <option value="home">Dom</option>
-                                    <option value="away">Goście</option>
-                                    <option value="draw">Remis</option>
-                                </select>
-                                <button onClick={() => handleBet(event.id)}>Postaw zakład</button>
-                            </div>
-                        ))
+                    {loading ? (
+                        <p style={{ color: '#bbb' }}>Ładowanie danych...</p>
                     ) : (
-                        <p>Brak wydarzeń w tym okresie.</p>
+                        <div>
+                            {events.length > 0 ? (
+                                events.map((event) => (
+                                    <div key={event.id} style={{
+                                        borderBottom: '1px solid #313131',
+                                        marginBottom: '18px',
+                                        paddingBottom: '14px',
+                                        background: 'rgba(44,45,46,0.92)',
+                                        borderRadius: '10px',
+                                        padding: '18px 18px 14px 18px',
+                                        color: '#eaeaea',
+                                        boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)'
+                                    }}>
+                                        <p style={{ fontSize: 17, fontWeight: 600, marginBottom: 6 }}>{event.event_name}</p>
+                                        <p style={{ margin: 0, color: '#bbb' }}>Data: {formatDate(event.event_date)}</p>
+                                        <p style={{ margin: '6px 0 10px 0', color: '#bbb' }}>
+                                            Kursy: <span style={{ color: '#fff' }}>Dom {event.home_odds.toFixed(2)}</span> |{' '}
+                                            <span style={{ color: '#fff' }}>Goście {event.away_odds.toFixed(2)}</span> |{' '}
+                                            <span style={{ color: '#fff' }}>Remis {event.draw_odds.toFixed(2)}</span>
+                                        </p>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                                            <input
+                                                type="number"
+                                                placeholder="Kwota zakładu"
+                                                value={betAmounts[event.id] || ''}
+                                                onChange={(e) => setBetAmounts({ ...betAmounts, [event.id]: e.target.value })}
+                                                min="1"
+                                                style={{
+                                                    padding: '8px 10px',
+                                                    borderRadius: 6,
+                                                    border: '1px solid #333',
+                                                    background: '#232526',
+                                                    color: '#fff',
+                                                    fontSize: 15,
+                                                    width: 120
+                                                }}
+                                            />
+                                            <select
+                                                value={betChoices[event.id] || 'home'}
+                                                onChange={(e) => setBetChoices({ ...betChoices, [event.id]: e.target.value })}
+                                                style={{
+                                                    padding: '8px 10px',
+                                                    borderRadius: 6,
+                                                    border: '1px solid #333',
+                                                    background: '#232526',
+                                                    color: '#fff',
+                                                    fontSize: 15
+                                                }}
+                                            >
+                                                <option value="home">Dom</option>
+                                                <option value="away">Goście</option>
+                                                <option value="draw">Remis</option>
+                                            </select>
+                                            <button
+                                                onClick={() => handleBet(event.id)}
+                                                style={{
+                                                    padding: '10px 18px',
+                                                    borderRadius: 6,
+                                                    border: 'none',
+                                                    background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+                                                    color: '#fff',
+                                                    fontWeight: 600,
+                                                    fontSize: 15,
+                                                    cursor: 'pointer',
+                                                    marginLeft: 6,
+                                                    transition: 'background 0.15s'
+                                                }}
+                                            >
+                                                Postaw zakład
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p style={{ color: '#bbb' }}>Brak wydarzeń w tym okresie.</p>
+                            )}
+                        </div>
                     )}
+
+                    {error && <p style={{ color: '#FF5252', marginTop: 16 }}>{error}</p>}
                 </div>
-            )}
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-
+            </div>
             <button
                 onClick={handleLogout}
                 style={{
                     position: 'fixed',
-                    bottom: '10px',
-                    left: '10px',
-                    padding: '10px 20px',
-                    backgroundColor: '#d9534f',
+                    bottom: '12px',
+                    left: '12px',
+                    padding: '13px 30px',
+                    background: 'linear-gradient(90deg, #888 0%, #666 100%)',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
+                    borderRadius: '7px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    boxShadow: '0 2px 12px 0 rgba(217,83,79,0.10)',
+                    transition: 'background 0.15s'
                 }}
             >
                 Wyloguj

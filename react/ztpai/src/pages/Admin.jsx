@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import logo from '../assets/logo.svg';
 
 const BET_RESULTS = [
   { result_id: 1, result_name: 'home' },
@@ -48,7 +49,7 @@ function Admin() {
       .catch((err) => {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setStatus('Brak dostępu. Zaloguj się jako administrator.');
-          setTimeout(() => navigate('/login'), 1000);
+          navigate('/login');
         } else {
           setStatus('Błąd podczas pobierania wydarzeń.');
         }
@@ -82,7 +83,7 @@ function Admin() {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         setStatus('Brak dostępu. Zaloguj się jako administrator.');
-        setTimeout(() => navigate('/login'), 1000);
+        navigate('/login');
       } else {
         setStatus(
           err.response?.data?.error ||
@@ -115,7 +116,7 @@ function Admin() {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         setAddEventStatus('Brak dostępu. Zaloguj się jako administrator.');
-        setTimeout(() => navigate('/login'), 1000);
+        navigate('/login');
       } else {
         setAddEventStatus(err.response?.data?.error || 'Błąd przy dodawaniu wydarzenia.');
       }
@@ -137,7 +138,7 @@ function Admin() {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         setDeleteEventStatus('Brak dostępu. Zaloguj się jako administrator.');
-        setTimeout(() => navigate('/login'), 1000);
+        navigate('/login');
       } else {
         setDeleteEventStatus(err.response?.data?.error || 'Błąd przy usuwaniu wydarzenia.');
       }
@@ -169,189 +170,375 @@ function Admin() {
     }
   };
 
+  // Logo click
+  const goToHome = () => {
+    navigate('/home');
+  };
+
+  // Go to admin users
+  const goToAdminUsers = () => {
+    navigate('/admin/users');
+  };
+
   return (
-    <div style={{ maxWidth: 700, margin: '2em auto', padding: 20, border: '1px solid #ddd' }}>
-      {/* Panel: Zakończ wydarzenie */}
-      <h2>Zakończ wydarzenie i rozlicz zakłady</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Wydarzenie:</label>
-          <select
-            value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            required
-          >
-            <option value="">-- Wybierz wydarzenie --</option>
-            {events
-              .filter((ev) => ev.status !== 2 && ev.status !== "2")
-              .map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.event_name} ({ev.event_date}) [Kursy: {ev.home_odds}/{ev.draw_odds}/{ev.away_odds}]
-                </option>
-              ))}
-          </select>
-        </div>
-        <div>
-          <label>Wynik meczu:</label>
-          <select
-            value={selectedResultId}
-            onChange={(e) => setSelectedResultId(e.target.value)}
-            required
-          >
-            <option value="">-- Wybierz wynik --</option>
-            {BET_RESULTS.map((res) => (
-              <option key={res.result_id} value={res.result_id}>
-                {res.result_name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" disabled={status === 'Wysyłanie...'}>
-          Rozlicz wydarzenie
+    <div style={{
+      minHeight: '100vh',
+      minWidth: '100vw',
+      background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      {/* Logo u góry, wyśrodkowane */}
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '34px 0 20px 0',
+        boxSizing: 'border-box'
+      }}>
+        <img
+          src={logo}
+          alt="Bettson"
+          style={{
+            width: 180,
+            height: 'auto',
+            cursor: 'pointer',
+            filter: 'brightness(0) invert(1)',
+            transition: 'transform 0.15s',
+          }}
+          onClick={goToHome}
+          title="Strona główna"
+        />
+      </div>
+      {/* Przycisk do admin/users */}
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: 20,
+      }}>
+        <button
+          onClick={goToAdminUsers}
+          style={{
+            padding: '12px 24px',
+            borderRadius: 7,
+            border: 'none',
+            background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer',
+            marginTop: 0,
+            transition: 'background 0.15s'
+          }}
+        >
+          Zarządzaj użytkownikami
         </button>
-      </form>
-      {status && <div style={{ marginTop: 10 }}>{status}</div>}
-      {summary && (
-        <div style={{ marginTop: 15, background: '#eee', padding: 10 }}>
-          <strong>{summary.message}</strong>
-          <br />
-          Wygranych: {summary.winners}
-          <br />
-          Przegranych: {summary.losers}
-        </div>
-      )}
+      </div>
 
-      {/* Panel: Dodaj wydarzenie */}
-      <hr style={{ margin: '2em 0' }} />
-      <h2>Dodaj wydarzenie</h2>
-      <form onSubmit={handleAddEvent}>
-        <div>
-          <label>Nazwa wydarzenia:</label>
-          <input
-            type="text"
-            value={addEventName}
-            onChange={(e) => setAddEventName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Data wydarzenia:</label>
-          <input
-            type="datetime-local"
-            value={addEventDate}
-            onChange={(e) => setAddEventDate(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Kurs na gospodarza (home_odds):</label>
-          <input
-            type="number"
-            value={addHomeOdds}
-            step="0.01"
-            min="1"
-            onChange={(e) => setAddHomeOdds(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Kurs na remis (draw_odds):</label>
-          <input
-            type="number"
-            value={addDrawOdds}
-            step="0.01"
-            min="1"
-            onChange={(e) => setAddDrawOdds(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Kurs na gości (away_odds):</label>
-          <input
-            type="number"
-            value={addAwayOdds}
-            step="0.01"
-            min="1"
-            onChange={(e) => setAddAwayOdds(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" disabled={addEventStatus === 'Wysyłanie...'}>
-          Dodaj wydarzenie
-        </button>
-      </form>
-      {addEventStatus && <div style={{ marginTop: 10 }}>{addEventStatus}</div>}
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{
+          maxWidth: '820px',
+          width: '100%',
+          background: 'rgba(24,25,26,0.98)',
+          borderRadius: '18px',
+          boxShadow: '0 6px 32px 0 rgba(0,0,0,0.12)',
+          padding: '30px 40px 40px 40px',
+          margin: '0 auto'
+        }}>
+          {/* Panel: Zakończ wydarzenie */}
+          <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Zakończ wydarzenie i rozlicz zakłady</h2>
+          <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ color: '#bbb', marginRight: 8 }}>Wydarzenie:</label>
+              <select
+                style={{
+                  borderRadius: 6, border: '1px solid #333', background: '#232526', color: '#fff', padding: '8px 10px'
+                }}
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                required
+              >
+                <option value="">-- Wybierz wydarzenie --</option>
+                {events
+                  .filter((ev) => ev.status !== 2 && ev.status !== "2")
+                  .map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.event_name} ({ev.event_date}) [Kursy: {ev.home_odds}/{ev.draw_odds}/{ev.away_odds}]
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ color: '#bbb', marginRight: 8 }}>Wynik meczu:</label>
+              <select
+                style={{
+                  borderRadius: 6, border: '1px solid #333', background: '#232526', color: '#fff', padding: '8px 10px'
+                }}
+                value={selectedResultId}
+                onChange={(e) => setSelectedResultId(e.target.value)}
+                required
+              >
+                <option value="">-- Wybierz wynik --</option>
+                {BET_RESULTS.map((res) => (
+                  <option key={res.result_id} value={res.result_id}>
+                    {res.result_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="submit"
+              disabled={status === 'Wysyłanie...'}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 7,
+                border: 'none',
+                background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                marginTop: 8,
+                transition: 'background 0.15s'
+              }}
+            >
+              Rozlicz wydarzenie
+            </button>
+          </form>
+          {status && <div style={{ marginTop: 10, color: status === 'Sukces!' ? '#2ecc40' : '#FF5252' }}>{status}</div>}
+          {summary && (
+            <div style={{ marginTop: 15, background: '#2c2c2e', padding: 12, color: '#fff', borderRadius: 8 }}>
+              <strong>{summary.message}</strong>
+              <br />
+              Wygranych: {summary.winners}
+              <br />
+              Przegranych: {summary.losers}
+            </div>
+          )}
 
-      {/* Panel: Usuń wydarzenie */}
-      <hr style={{ margin: '2em 0' }} />
-      <h2>Usuń wydarzenie</h2>
-      <form onSubmit={handleDeleteEvent}>
-        <div>
-          <label>Wydarzenie:</label>
-          <select
-            value={deleteEventId}
-            onChange={(e) => setDeleteEventId(e.target.value)}
-            required
-          >
-            <option value="">-- Wybierz wydarzenie do usunięcia --</option>
-            {events.map((ev) => (
-              <option key={ev.id} value={ev.id}>
-                {ev.event_name} ({ev.event_date})
-              </option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" disabled={deleteEventStatus === 'Usuwanie...'}>
-          Usuń wydarzenie
-        </button>
-      </form>
-      {deleteEventStatus && <div style={{ marginTop: 10 }}>{deleteEventStatus}</div>}
+          {/* Panel: Dodaj wydarzenie */}
+          <hr style={{ margin: '2em 0', borderColor: '#222' }} />
+          <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Dodaj wydarzenie</h2>
+          <form onSubmit={handleAddEvent} style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', display: 'block', marginBottom: 2 }}>Nazwa wydarzenia:</label>
+              <input
+                type="text"
+                value={addEventName}
+                onChange={(e) => setAddEventName(e.target.value)}
+                required
+                style={{
+                  width: '100%', padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', display: 'block', marginBottom: 2 }}>Data wydarzenia:</label>
+              <input
+                type="datetime-local"
+                value={addEventDate}
+                onChange={(e) => setAddEventDate(e.target.value)}
+                required
+                style={{
+                  width: '100%', padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', display: 'block', marginBottom: 2 }}>Kurs na gospodarza (home_odds):</label>
+              <input
+                type="number"
+                value={addHomeOdds}
+                step="0.01"
+                min="1"
+                onChange={(e) => setAddHomeOdds(e.target.value)}
+                required
+                style={{
+                  width: '100%', padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', display: 'block', marginBottom: 2 }}>Kurs na remis (draw_odds):</label>
+              <input
+                type="number"
+                value={addDrawOdds}
+                step="0.01"
+                min="1"
+                onChange={(e) => setAddDrawOdds(e.target.value)}
+                required
+                style={{
+                  width: '100%', padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', display: 'block', marginBottom: 2 }}>Kurs na gości (away_odds):</label>
+              <input
+                type="number"
+                value={addAwayOdds}
+                step="0.01"
+                min="1"
+                onChange={(e) => setAddAwayOdds(e.target.value)}
+                required
+                style={{
+                  width: '100%', padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={addEventStatus === 'Wysyłanie...'}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 7,
+                border: 'none',
+                background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                marginTop: 8,
+                transition: 'background 0.15s'
+              }}
+            >
+              Dodaj wydarzenie
+            </button>
+          </form>
+          {addEventStatus && <div style={{ marginTop: 10, color: addEventStatus.includes('dodano') || addEventStatus.includes('Dodano') ? '#2ecc40' : '#FF5252' }}>{addEventStatus}</div>}
 
-      {/* Panel: Dodaj punkty wszystkim użytkownikom */}
-      <hr style={{ margin: '2em 0' }} />
-      <h2>Dodaj punkty wszystkim użytkownikom</h2>
-      <form onSubmit={handleAddPoints}>
-        <div>
-          <label>Liczba punktów do dodania:</label>
-          <input
-            type="number"
-            value={addPoints}
-            onChange={e => setAddPoints(e.target.value)}
-            required
-            min="1"
-          />
-        </div>
-        <button type="submit" disabled={addPointsStatus === 'Wysyłanie...'}>Dodaj punkty</button>
-      </form>
-      {addPointsStatus && <div style={{ marginTop: 10 }}>{addPointsStatus}</div>}
+          {/* Panel: Usuń wydarzenie */}
+          <hr style={{ margin: '2em 0', borderColor: '#222' }} />
+          <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Usuń wydarzenie</h2>
+          <form onSubmit={handleDeleteEvent} style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', marginRight: 8 }}>Wydarzenie:</label>
+              <select
+                style={{
+                  borderRadius: 6, border: '1px solid #333', background: '#232526', color: '#fff', padding: '8px 10px'
+                }}
+                value={deleteEventId}
+                onChange={(e) => setDeleteEventId(e.target.value)}
+                required
+              >
+                <option value="">-- Wybierz wydarzenie do usunięcia --</option>
+                {events.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.event_name} ({ev.event_date})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="submit"
+              disabled={deleteEventStatus === 'Usuwanie...'}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 7,
+                border: 'none',
+                background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                marginTop: 8,
+                transition: 'background 0.15s'
+              }}
+            >
+              Usuń wydarzenie
+            </button>
+          </form>
+          {deleteEventStatus && <div style={{ marginTop: 10, color: deleteEventStatus.includes('Usunięto') ? '#2ecc40' : '#FF5252' }}>{deleteEventStatus}</div>}
 
-      {/* Tabela wydarzeń */}
-      <hr style={{ margin: '2em 0' }} />
-      <h2>Lista wydarzeń</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>Nazwa</th>
-            <th>Data</th>
-            <th>Kurs home</th>
-            <th>Kurs draw</th>
-            <th>Kurs away</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map(ev => (
-            <tr key={ev.id}>
-              <td>{ev.event_name}</td>
-              <td>{ev.event_date}</td>
-              <td>{ev.home_odds}</td>
-              <td>{ev.draw_odds}</td>
-              <td>{ev.away_odds}</td>
-              <td>{ev.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          {/* Panel: Dodaj punkty wszystkim użytkownikom */}
+          <hr style={{ margin: '2em 0', borderColor: '#222' }} />
+          <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Dodaj punkty wszystkim użytkownikom</h2>
+          <form onSubmit={handleAddPoints} style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ color: '#bbb', marginRight: 10 }}>Liczba punktów do dodania:</label>
+              <input
+                type="number"
+                value={addPoints}
+                onChange={e => setAddPoints(e.target.value)}
+                required
+                min="1"
+                style={{
+                  width: 100, padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid #333', background: '#232526', color: '#fff'
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={addPointsStatus === 'Wysyłanie...'}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 7,
+                border: 'none',
+                background: 'linear-gradient(90deg, #5a5a5a 0%, #818181 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                marginTop: 8,
+                transition: 'background 0.15s'
+              }}
+            >
+              Dodaj punkty
+            </button>
+          </form>
+          {addPointsStatus && <div style={{ marginTop: 10, color: addPointsStatus.includes('dodane') || addPointsStatus.includes('Dodano') ? '#2ecc40' : '#FF5252' }}>{addPointsStatus}</div>}
+
+          {/* Tabela wydarzeń */}
+          <hr style={{ margin: '2em 0', borderColor: '#222' }} />
+          <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Lista wydarzeń</h2>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              background: 'rgba(44,45,46,0.92)',
+              borderRadius: '10px',
+              color: '#fff'
+            }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Nazwa</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Data</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Kurs home</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Kurs draw</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Kurs away</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #333' }}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map(ev => (
+                  <tr key={ev.id}>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.event_name}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.event_date}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.home_odds}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.draw_odds}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.away_odds}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #232526' }}>{ev.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
