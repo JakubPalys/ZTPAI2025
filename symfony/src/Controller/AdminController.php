@@ -66,6 +66,9 @@ class AdminController extends AbstractController
                 'id' => $event->getId(),
                 'event_name' => $event->getEventName(),
                 'event_date' => $event->getEventDate()->format('Y-m-d H:i:s'),
+                'home_odds' => $event->getHomeOdds(),
+                'away_odds' => $event->getAwayOdds(),
+                'draw_odds' => $event->getDrawOdds(),
                 'status' => $event->getStatusId(),
             ];
         }
@@ -86,8 +89,8 @@ class AdminController extends AbstractController
         ]);
 }
 
-    #[Route('/api/admin/add-event', name: 'admin_add_event', methods: ['POST'])]
-    public function addEvent(Request $request): JsonResponse
+   #[Route('/api/admin/add-event', name: 'admin_add_event', methods: ['POST'])]
+    public function addEvent(Request $request, SessionInterface $session): JsonResponse
     {
         $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
         if ($checkAdminResponse) {
@@ -97,31 +100,52 @@ class AdminController extends AbstractController
         $event = new Event();
         $event->setEventName($request->request->get('event_name'));
         $event->setEventDate(new \DateTime($request->request->get('event_date')));
+        $event->setHomeOdds((float)$request->request->get('home_odds'));
+        $event->setAwayOdds((float)$request->request->get('away_odds'));
+        $event->setDrawOdds((float)$request->request->get('draw_odds'));
+        $event->setStatusId(1);
 
         $this->entityManager->persist($event);
         $this->entityManager->flush();
 
         return $this->json(['success' => 'Event added successfully']);
     }
-
-    #[Route('/api/admin/delete-event', name: 'admin_delete_event', methods: ['POST'])]
-    public function deleteEvent(Request $request): JsonResponse
-    {
-        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
-        if ($checkAdminResponse) {
-            return $checkAdminResponse;
-        }
-
-        $event = $this->eventRepository->find($request->request->get('event_id'));
-
-        if ($event) {
-            $this->entityManager->remove($event);
-            $this->entityManager->flush();
-            return $this->json(['success' => 'Event deleted successfully']);
-        }
-
-        return $this->json(['error' => 'Event not found'], 404);
+  #[Route('/api/admin/delete-event', name: 'admin_delete_event', methods: ['POST'])]
+public function deleteEvent(Request $request, SessionInterface $session): JsonResponse
+{
+    $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
+    if ($checkAdminResponse) {
+        return $checkAdminResponse;
     }
+
+    $eventId = $request->request->get('event_id');
+    $event = $this->eventRepository->find($eventId);
+
+    if ($event) {
+        $statusId = $event->getStatusId();
+
+        $bets = $this->betRepository->findBy(['event' => $event]);
+        $betsCount = 0;
+        $pointsReturnedCount = 0;
+
+        foreach ($bets as $bet) {
+            $user = $bet->getUser();
+            if ($statusId == 1 && $user && $bet->getBetAmount()) {
+                $user->setPoints($user->getPoints() + $bet->getBetAmount());
+            }
+            $this->entityManager->remove($bet);
+            $betsCount++;
+        }
+
+        $this->entityManager->remove($event);
+        $this->entityManager->flush();
+        return $this->json([
+            'success' => 'Event deleted successfully. Deleted bets: ' . $betsCount
+        ]);
+    }
+
+    return $this->json(['error' => 'Event not found'], 404);
+}
 
     #[Route('/api/admin/finish-event', name: 'admin_finish_event', methods: ['POST'])]
 public function finishEvent(Request $request, ResultRepository $resultRepository,SessionInterface $session): JsonResponse

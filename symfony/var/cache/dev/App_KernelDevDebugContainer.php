@@ -16,7 +16,7 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerCblejEK\App_KernelDevDebugContainer([
     'container.build_hash' => 'CblejEK',
-    'container.build_id' => '97af6855',
-    'container.build_time' => 1748472739,
+    'container.build_id' => '513eecf2',
+    'container.build_time' => 1748475563,
     'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerCblejEK');
