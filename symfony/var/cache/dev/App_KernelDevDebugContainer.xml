@@ -234,6 +234,7 @@
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <argument type="service" id="App\Repository\EventRepository"/>
+      <argument type="service" id="App\Repository\UserRoleRepository"/>
       <argument type="service" id="App\Repository\UserRepository"/>
       <argument type="service" id="App\Repository\BetRepository"/>
       <argument type="service" id="doctrine.orm.default_entity_manager"/>

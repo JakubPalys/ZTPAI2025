@@ -17,11 +17,11 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login setUser={setUser} />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/users" element={<UsersList />} /> 
+                <Route path="/admin/users" element={<UsersList />} /> 
                 <Route path="/profile" element={<Profile />} /> 
                 <Route path="/admin" element={<Admin />} /> 
                 <Route path="/home" element={<Home />} />
-                <Route path="/users/:id" element={<UserDetails />} />
+                <Route path="/admin/users/:id" element={<UserDetails />} />
             </Routes>
         </Router>
     );

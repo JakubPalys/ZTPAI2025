@@ -7,9 +7,9 @@ function UsersList() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        axios.get("http://localhost:8001/api/users")
+        axios.get("http://localhost:8001/api/admin/users", { withCredentials: true })
             .then(response => {
-                setUsers(response.data);
+                setUsers(response.data.users || []);
                 setError("");
             })
             .catch(() => {
@@ -18,19 +18,38 @@ function UsersList() {
     }, []);
 
     return (
-        <div>
-            <h2>Lista Użytkowników</h2>
-            {error && <p>{error}</p>}
+        <div style={{ maxWidth: 600, margin: "2em auto", padding: 20, border: "1px solid #ddd" }}>
+            <h2>Lista użytkowników</h2>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             {users.length === 0 ? (
                 <p>Brak użytkowników do wyświetlenia.</p>
             ) : (
-                <ul>
-                    {users.map(user => (
-                        <li key={user.id}>
-                            <Link to={`/users/${user.id}`}>{user.username}</Link> - {user.email}
-                        </li>
-                    ))}
-                </ul>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nazwa użytkownika</th>
+                            <th>Email</th>
+                            <th>Rola</th>
+                            <th>Punkty</th>
+                            <th>Szczegóły</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map(user => (
+                            <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.username}</td>
+                                <td>{user.email}</td>
+                                <td>{user.role}</td>
+                                <td>{user.points}</td>
+                                <td>
+                                    <Link to={`/admin/users/${user.id}`}>Zarządzaj</Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             )}
         </div>
     );

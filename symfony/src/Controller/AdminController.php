@@ -25,11 +25,12 @@ class AdminController extends AbstractController
     private BetRepository $betRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EventRepository $eventRepository, UserRepository $userRepository, BetRepository $betRepository, EntityManagerInterface $entityManager)
+    public function __construct(EventRepository $eventRepository, UserRoleRepository $userRoleRepository, UserRepository $userRepository, BetRepository $betRepository, EntityManagerInterface $entityManager)
     {
         $this->eventRepository = $eventRepository;
         $this->userRepository = $userRepository;
         $this->betRepository = $betRepository;
+        $this->userRoleRepository = $userRoleRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -198,4 +199,86 @@ public function finishEvent(Request $request, ResultRepository $resultRepository
         'losers' => $losers,
     ]);
 }
+
+    #[Route('/api/admin/users', name: 'admin_list_users', methods: ['GET'])]
+    public function listUsers(SessionInterface $session): JsonResponse
+    {
+        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
+        if ($checkAdminResponse) {
+            return $checkAdminResponse;
+        }
+
+        $users = $this->userRepository->findAll();
+        $usersData = [];
+        foreach ($users as $user) {
+            $usersData[] = [
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole()->getRoleName(),
+                'points' => $user->getPoints(),
+            ];
+        }
+
+        return $this->json(['users' => $usersData]);
+    }
+
+    #[Route('/api/admin/users/{id}', name: 'admin_user_details', methods: ['GET', 'PUT', 'DELETE'])]
+    public function userDetails(int $id, Request $request, SessionInterface $session): JsonResponse
+    {
+        $checkAdminResponse = $this->checkAdmin($session, $this->userRepository);
+        if ($checkAdminResponse) {
+            return $checkAdminResponse;
+        }
+
+        $user = $this->userRepository->find($id);
+
+        if (!$user) {
+            return $this->json(['error' => 'User not found'], 404);
+        }
+        if ($request->isMethod('GET')) {
+            return $this->json([
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole()->getRoleName(),
+                'points' => $user->getPoints(),
+            ]);
+        }
+
+        if ($request->isMethod('PUT')) {
+            $data = json_decode($request->getContent(), true);
+
+            if (isset($data['username'])) {
+                $user->setUsername($data['username']);
+            }
+            if (isset($data['email'])) {
+                $user->setEmail($data['email']);
+            }
+            if (isset($data['points'])) {
+                $user->setPoints((int)$data['points']);
+            }
+            if (isset($data['role'])) {
+                $role = $this->userRoleRepository->findOneBy(['role_name' => $data['role']]);
+                if ($role) {
+                    $user->setRole($role);
+                } else {
+                    return $this->json(['error' => 'Podana rola nie istnieje.'], 400);
+                }
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json(['success' => 'User updated successfully']);
+        }
+
+        if ($request->isMethod('DELETE')) {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+
+            return $this->json(['success' => 'User deleted successfully']);
+        }
+
+        return $this->json(['error' => 'Invalid method'], 405);
+    }
 }

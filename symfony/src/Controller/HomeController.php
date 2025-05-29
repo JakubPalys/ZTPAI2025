@@ -74,7 +74,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/api/place_bet', name: 'place_bet', methods: ['POST'])]
+    #[Route('/api/place-bet', name: 'place_bet', methods: ['POST'])]
 public function placeBet(Request $request, SessionInterface $session, EventRepository $eventRepository, UserRepository $userRepository): JsonResponse
 {
     $userId = $session->get('user_id');

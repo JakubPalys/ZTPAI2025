@@ -41,7 +41,7 @@ function Home() {
                 bet_choice: betChoice,
             };
 
-            const response = await axios.post('http://localhost:8001/api/place_bet',
+            const response = await axios.post('http://localhost:8001/api/place-bet',
                 eventData,
                 {
                     withCredentials: true,

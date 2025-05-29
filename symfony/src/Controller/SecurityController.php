@@ -26,43 +26,6 @@ class SecurityController extends AbstractController
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
     }
-    #[Route('/api/users', name: 'get_users', methods: ['GET'])]
-    public function getUsers(): JsonResponse
-{
-    $users = $this->userRepository->findAll();
-
-    if (empty($users)) {
-        return $this->json(['message' => 'No users found'], 404);
-    }
-
-    $data = [];
-    foreach ($users as $user) {
-        $data[] = [
-            'id' => $user->getId(),
-            'username' => $user->getUsername(),
-            'email' => $user->getEmail(),
-        ];
-    }
-
-    return $this->json($data);
-}
-
-#[Route('/api/users/{id}', name: 'get_user', methods: ['GET'])]
-public function getUserById(int $id): JsonResponse
-{
-    $user = $this->userRepository->findUserById($id);
-
-    if (!$user) {
-        return $this->json(['error' => 'Użytkownik nie znaleziony'], 404);
-    }
-
-    return $this->json([
-        'id' => $user->getId(),
-        'username' => $user->getUsername(),
-        'email' => $user->getEmail(),
-        'points' => $user->getPoints(),
-    ]);
-}
 
 #[Route('/api/login', name: 'login', methods: ['POST'])]
 public function login(Request $request, SessionInterface $session, UserRepository $userRepository): JsonResponse
@@ -82,14 +45,10 @@ public function login(Request $request, SessionInterface $session, UserRepositor
     return $this->json(['message' => 'Logged in']);
 }
 
-#[Route('/api/register', name: 'register', methods: ['GET','POST'])]
+#[Route('/api/register', name: 'register', methods: ['POST'])]
 public function register(Request $request, EntityManagerInterface $em, UserRepository $userRepository, UserRoleRepository $userRoleRepository): JsonResponse
 {
     try {
-        if ($request->isMethod('GET')) {
-            return $this->json(['message' => 'Wyślij dane rejestracyjne metodą POST'], 200);
-        }
-
         $data = json_decode($request->getContent(), true);
 
         if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
@@ -105,7 +64,7 @@ public function register(Request $request, EntityManagerInterface $em, UserRepos
         $user->setEmail($data['email']);
         $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
         $user->setPoints(1000);
-        
+
         $role = $userRoleRepository->findOneBy(['role_name' => 'user']);
         if (!$role) {
             return $this->json(['error' => 'Nie znaleziono roli user'], 500);
