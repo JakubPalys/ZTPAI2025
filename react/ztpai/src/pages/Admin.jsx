@@ -16,7 +16,6 @@ function Admin() {
   const [status, setStatus] = useState('');
   const [summary, setSummary] = useState(null);
 
-  // Add Event
   const [addEventName, setAddEventName] = useState('');
   const [addEventDate, setAddEventDate] = useState('');
   const [addHomeOdds, setAddHomeOdds] = useState('');
@@ -24,17 +23,14 @@ function Admin() {
   const [addDrawOdds, setAddDrawOdds] = useState('');
   const [addEventStatus, setAddEventStatus] = useState('');
 
-  // Delete Event
   const [deleteEventId, setDeleteEventId] = useState('');
   const [deleteEventStatus, setDeleteEventStatus] = useState('');
 
-  // Add Points To All Users
   const [addPoints, setAddPoints] = useState('');
   const [addPointsStatus, setAddPointsStatus] = useState('');
 
   const navigate = useNavigate();
 
-  // Fetch events on mount or after add/delete
   const fetchEvents = () => {
     axios
       .get('http://localhost:8001/api/admin', { withCredentials: true })
@@ -58,10 +54,9 @@ function Admin() {
 
   useEffect(() => {
     fetchEvents();
-    // eslint-disable-next-line
+
   }, [navigate]);
 
-  // Finish Event
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('Wysyłanie...');
@@ -93,7 +88,6 @@ function Admin() {
     }
   };
 
-  // Add Event
   const handleAddEvent = async (e) => {
     e.preventDefault();
     setAddEventStatus('Wysyłanie...');
@@ -123,7 +117,6 @@ function Admin() {
     }
   };
 
-  // Delete Event
   const handleDeleteEvent = async (e) => {
     e.preventDefault();
     setDeleteEventStatus('Usuwanie...');
@@ -145,7 +138,6 @@ function Admin() {
     }
   };
 
-  // Add Points To All Users
   const handleAddPoints = async (e) => {
     e.preventDefault();
     setAddPointsStatus('Wysyłanie...');
@@ -170,12 +162,10 @@ function Admin() {
     }
   };
 
-  // Logo click
   const goToHome = () => {
     navigate('/home');
   };
 
-  // Go to admin users
   const goToAdminUsers = () => {
     navigate('/admin/users');
   };
@@ -189,7 +179,6 @@ function Admin() {
       flexDirection: 'column',
       alignItems: 'center'
     }}>
-      {/* Logo u góry, wyśrodkowane */}
       <div style={{
         width: '100%',
         display: 'flex',
@@ -212,7 +201,6 @@ function Admin() {
           title="Strona główna"
         />
       </div>
-      {/* Przycisk do admin/users */}
       <div style={{
         width: '100%',
         display: 'flex',
@@ -253,7 +241,6 @@ function Admin() {
           padding: '30px 40px 40px 40px',
           margin: '0 auto'
         }}>
-          {/* Panel: Zakończ wydarzenie */}
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Zakończ wydarzenie i rozlicz zakłady</h2>
           <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
             <div style={{ marginBottom: 12 }}>
@@ -324,7 +311,6 @@ function Admin() {
             </div>
           )}
 
-          {/* Panel: Dodaj wydarzenie */}
           <hr style={{ margin: '2em 0', borderColor: '#222' }} />
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Dodaj wydarzenie</h2>
           <form onSubmit={handleAddEvent} style={{ marginBottom: 24 }}>
@@ -420,7 +406,6 @@ function Admin() {
           </form>
           {addEventStatus && <div style={{ marginTop: 10, color: addEventStatus.includes('dodano') || addEventStatus.includes('Dodano') ? '#2ecc40' : '#FF5252' }}>{addEventStatus}</div>}
 
-          {/* Panel: Usuń wydarzenie */}
           <hr style={{ margin: '2em 0', borderColor: '#222' }} />
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Usuń wydarzenie</h2>
           <form onSubmit={handleDeleteEvent} style={{ marginBottom: 24 }}>
@@ -463,7 +448,6 @@ function Admin() {
           </form>
           {deleteEventStatus && <div style={{ marginTop: 10, color: deleteEventStatus.includes('Usunięto') ? '#2ecc40' : '#FF5252' }}>{deleteEventStatus}</div>}
 
-          {/* Panel: Dodaj punkty wszystkim użytkownikom */}
           <hr style={{ margin: '2em 0', borderColor: '#222' }} />
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Dodaj punkty wszystkim użytkownikom</h2>
           <form onSubmit={handleAddPoints} style={{ marginBottom: 24 }}>
@@ -502,7 +486,6 @@ function Admin() {
           </form>
           {addPointsStatus && <div style={{ marginTop: 10, color: addPointsStatus.includes('dodane') || addPointsStatus.includes('Dodano') ? '#2ecc40' : '#FF5252' }}>{addPointsStatus}</div>}
 
-          {/* Tabela wydarzeń */}
           <hr style={{ margin: '2em 0', borderColor: '#222' }} />
           <h2 style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Lista wydarzeń</h2>
           <div style={{ overflowX: 'auto' }}>

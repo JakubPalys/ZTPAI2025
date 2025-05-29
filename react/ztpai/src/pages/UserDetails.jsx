@@ -11,7 +11,6 @@ function UserDetails() {
     const [error, setError] = useState("");
     const [status, setStatus] = useState("");
 
-    // Edycja pól
     const [editMode, setEditMode] = useState(false);
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -29,14 +28,13 @@ function UserDetails() {
                 setError("");
             })
             .catch((err) => {
-                // Zabezpieczenie: jeśli 401/403, przekieruj do login
                 if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                     navigate("/login");
                 } else {
                     setError("Błąd pobierania danych użytkownika.");
                 }
             });
-        // eslint-disable-next-line
+
     }, [id]);
 
     const handleEdit = () => setEditMode(true);
@@ -91,7 +89,6 @@ function UserDetails() {
             });
     };
 
-    // Logo click
     const goToHome = () => {
         navigate('/home');
     };
@@ -112,7 +109,6 @@ function UserDetails() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            {/* Logo u góry, wyśrodkowane */}
             <div style={{
                 width: '100%',
                 display: 'flex',

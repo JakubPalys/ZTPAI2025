@@ -17,7 +17,6 @@ function Home() {
     const fetchUserAndEvents = async () => {
         try {
             const eventsRes = await axios.get('http://localhost:8001/api/home', { withCredentials: true });
-            // Jeśli backend zwraca brak autoryzacji (np. 401), axios rzuci wyjątek i przejdzie do catch
             setUser(eventsRes.data.user.username);
             setRole(eventsRes.data.user.role);
             setPoints(eventsRes.data.user.points);
@@ -37,7 +36,7 @@ function Home() {
 
     useEffect(() => {
         fetchUserAndEvents();
-        // eslint-disable-next-line
+
     }, []);
 
     const handleBet = async (eventId) => {
@@ -62,8 +61,8 @@ function Home() {
 
             if (response.data.success) {
                 alert(`Bet placed! Potential win: ${response.data.potential_win}`);
-                setBetAmounts({ ...betAmounts, [eventId]: '' }); // czyść input
-                fetchUserAndEvents(); // odśwież dane na stronie
+                setBetAmounts({ ...betAmounts, [eventId]: '' });
+                fetchUserAndEvents();
             } else {
                 setError(response.data.error);
             }

@@ -15,17 +15,15 @@ function UsersList() {
                 setError("");
             })
             .catch((err) => {
-                // Zabezpieczenie: jeśli 401/403, przekieruj do login
                 if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                     navigate("/login");
                 } else {
                     setError("Błąd pobierania danych");
                 }
             });
-        // eslint-disable-next-line
+
     }, []);
 
-    // Logo click
     const goToHome = () => {
         navigate('/home');
     };
@@ -39,7 +37,7 @@ function UsersList() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            {/* Logo u góry, wyśrodkowane */}
+
             <div style={{
                 width: '100%',
                 display: 'flex',

@@ -18,7 +18,7 @@ function Profile() {
 
     useEffect(() => {
         fetchProfile();
-        // eslint-disable-next-line
+
     }, []);
 
     const fetchProfile = async () => {
@@ -30,7 +30,6 @@ function Profile() {
             setActiveBets(res.data.activeBets);
             setCompletedBets(res.data.completedBets);
         } catch (err) {
-            // Autoryzacja - jeśli nie zalogowany, przekieruj do login
             if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                 navigate('/login');
             } else {
@@ -107,15 +106,12 @@ function Profile() {
         return '';
     };
 
-    // Logo click
     const goToHome = () => {
         navigate('/home');
     };
-
-    // Stylizacja kafelków zakładów
     const betCardStyle = outcome => ({
         background: outcome === 1
-            ? 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)'           // ciemniejszy gradient
+            ? 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)' 
             : outcome === 2
             ? 'linear-gradient(90deg, #d9534f 0%, #c9302c 100%)'
             : 'rgba(44,45,46,0.92)',
@@ -134,7 +130,6 @@ function Profile() {
         gap: 7
     });
 
-    // Badge typu zakładu
     const badgeStyle = (choice) => ({
         display: 'inline-block',
         padding: '3px 11px',
@@ -154,7 +149,6 @@ function Profile() {
         marginLeft: 5,
     });
 
-    // Badge wyniku
     const resultBadge = (outcome) => ({
         display: 'inline-block',
         padding: '3px 11px',
@@ -184,7 +178,6 @@ function Profile() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            {/* Logo u góry, wyśrodkowane */}
             <div style={{
                 width: '100%',
                 display: 'flex',
