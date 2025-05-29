@@ -25,7 +25,7 @@ function Register() {
         const userData = { name: username, email, password };
         try {
             const response = await axios.post('http://localhost:8001/api/register', userData);
-            setSuccessMessage(response.data.message);
+            alert(response.data.message);
             setError('');
             navigate('/login');
         } catch (err) {
