@@ -1,4 +1,4 @@
-# Bukmacher Online – Aplikacja Internetowa
+# Bukmacher Gra Online – Bettson
 
 ## Opis projektu
 
@@ -9,43 +9,11 @@ Bukmacher Online to aplikacja webowa będąca symulacją gry bukmacherskiej. Uż
 - zarządzać swoim profilem i historią zakładów,
 - administrator może rozliczać wydarzenia, dodawać je i zarządzać użytkownikami.
 
-Aplikacja składa się z backendu (PHP Symfony, REST API) oraz frontend (React). Dane przechowywane są w bazie MySQL uruchamianej w kontenerze Docker.
-
 ---
 
 ## Schemat architektury
 
-```mermaid
-flowchart TD
-    subgraph Frontend [React]
-        A1[Strona główna]
-        A2[Panel użytkownika]
-        A3[Panel admina]
-    end
-    subgraph Backend [Symfony PHP REST API]
-        B1[Kontrolery API]
-        B2[Logika gry]
-        B3[Autoryzacja sesyjna]
-    end
-    subgraph Database [MySQL (Docker)]
-        C1[Tabela users]
-        C2[Tabela events]
-        C3[Tabela bets]
-        C4[Tabela roles]
-        C5[Tabela results]
-    end
-
-    A1 -->|HTTP JSON| B1
-    A2 -->|HTTP JSON| B1
-    A3 -->|HTTP JSON| B1
-    B1 -->|Doctrine ORM| C1
-    B1 -->|Doctrine ORM| C2
-    B1 -->|Doctrine ORM| C3
-    B1 -->|Doctrine ORM| C4
-    B1 -->|Doctrine ORM| C5
-```
-
----
+Aplikacja składa się z backendu (PHP Symfony, REST API) oraz frontend (React). Dane przechowywane są w bazie MySQL uruchamianej w kontenerze Docker.
 
 ## Instrukcja uruchomienia
 
@@ -56,44 +24,18 @@ git clone <repo-url>
 cd <repo-folder>
 ```
 
-### 2. Uruchomienie bazy danych (MySQL + Docker)
+### 2. Uruchomienie bazy danych i backend (MySQL + Docker)
 
 ```sh
+cd .\symfony\
 docker-compose up -d
-# lub ręcznie:
-docker run --name bukmacher-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bukmacher -p 3306:3306 -d mysql:8
 ```
 
-### 3. Backend (PHP Symfony)
-
-- Przejdź do katalogu backend:
-    ```sh
-    cd backend
-    ```
-- Zainstaluj zależności:
-    ```sh
-    composer install
-    ```
-- Skonfiguruj `.env` (dane do bazy):
-    ```
-    DATABASE_URL="mysql://root:root@127.0.0.1:3306/bukmacher"
-    ```
-- Wykonaj migracje:
-    ```sh
-    php bin/console doctrine:migrations:migrate
-    ```
-- Uruchom backend:
-    ```sh
-    symfony server:start
-    # lub
-    php -S 127.0.0.1:8000 -t public
-    ```
-
-### 4. Frontend (React)
+### 3. Frontend (React)
 
 - Przejdź do katalogu frontend:
     ```sh
-    cd frontend
+    cd .\react\ztpai\
     ```
 - Zainstaluj zależności:
     ```sh
@@ -101,9 +43,9 @@ docker run --name bukmacher-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=
     ```
 - Uruchom frontend:
     ```sh
-    npm start
+    npm run dev
     ```
-- Aplikacja dostępna na [http://localhost:3000](http://localhost:3000)
+- Aplikacja dostępna na [http://localhost:5173/](http://localhost:5173/)
 
 ---
 
@@ -128,8 +70,3 @@ docker run --name bukmacher-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=
 
 - Jakub Palys
 
----
-
-## Licencja
-
-MIT
